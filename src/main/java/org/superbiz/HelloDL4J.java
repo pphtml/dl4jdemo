@@ -22,11 +22,15 @@ import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.superbiz.util.LoggingConfig;
 
+import java.util.logging.Logger;
+
 public class HelloDL4J {
     static {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
         System.setProperty("org.jooq.no-logo", "true");
     }
+
+    private static final Logger LOGGER = Logger.getLogger(HelloDL4J.class.getName());
 
     private static final int FEATURES_COUNT = 4;
     private static final int CLASSES_COUNT = 3;
@@ -74,7 +78,7 @@ public class HelloDL4J {
             Evaluation eval = new Evaluation(3);
             eval.eval(testData.getLabels(), output);
 
-            System.out.println(eval.stats());
+            LOGGER.info(eval.stats());
         }
     }
 }

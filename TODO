@@ -1,1 +1,11 @@
+- initial data dump
+- initial data load script
+- entita price
+- aktualizace na v8 - https://query1.finance.yahoo.com/v8/finance/chart/AMZN?symbol=AMZN&period1=1454281200&period2=1486508400&interval=1d&includePrePost=true&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com
+- marketwatch data - https://www.marketwatch.com/investing/stock/goog/analystestimates
+- referencni integrita
+- paralelni cteni - omezit na pocet vlaken
+- ukladat S&P 500 index
+
+
 JDBC_DATABASE_URL=$JDBC_DE mvn install

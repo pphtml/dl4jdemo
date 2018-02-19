@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.superbiz</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>test</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>demo</name>
+    <name>test</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -36,7 +36,6 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <!--<url><![CDATA[jdbc:postgresql://localhost:5432/demo?user=demo&password=demo123]]></url>-->
                         <url>${env.JDBC_DATABASE_URL}</url>
                     </jdbc>
                     <generator>

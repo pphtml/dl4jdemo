@@ -3,4 +3,5 @@ target/
 *.iml
 dependency-reduced-pom.xml
 src/main/java/org/superbiz/model/jooq/
+mvinst.sh
 
