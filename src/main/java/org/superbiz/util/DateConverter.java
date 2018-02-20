@@ -10,11 +10,15 @@ import java.util.Optional;
 public class DateConverter {
     public static Date from(Optional<LocalDate> optionalDate) {
         if (optionalDate.isPresent()) {
-            long epoch = optionalDate.get().atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000;
-            return new Date(epoch);
+            return from(optionalDate.get());
         } else {
             return null;
         }
+    }
+
+    public static Date from(LocalDate date) {
+        long epoch = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000;
+        return new Date(epoch);
     }
 
     public static long toEpochMillis(LocalDate date) {
