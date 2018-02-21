@@ -1,8 +1,16 @@
 package org.superbiz.fetch.model;
 
+import org.nd4j.shade.jackson.annotation.JsonInclude;
+import org.nd4j.shade.jackson.databind.annotation.JsonDeserialize;
+import org.nd4j.shade.jackson.databind.annotation.JsonSerialize;
+import org.superbiz.util.DiffAttribute;
+import org.superbiz.util.LocalDateDeserializer;
+import org.superbiz.util.LocalDateSerializer;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MarketWatchData {
     private String symbol;
     private BigDecimal targetPrice;
@@ -20,7 +28,11 @@ public class MarketWatchData {
     private Integer hold;
     private Integer underweight;
     private Integer sell;
+    @DiffAttribute(ignoreForComparison = true)
     private String history;
+    @DiffAttribute(setOnlyIfChanging = true)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate lastUpdated;
 
     public String getSymbol() {
@@ -89,6 +101,10 @@ public class MarketWatchData {
 
     public String getHistory() {
         return history;
+    }
+
+    public void setHistory(String history) {
+        this.history = history;
     }
 
     public LocalDate getLastUpdated() {
