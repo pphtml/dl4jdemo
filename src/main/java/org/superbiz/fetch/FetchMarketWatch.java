@@ -3,34 +3,26 @@ package org.superbiz.fetch;
 import org.asynchttpclient.*;
 import org.asynchttpclient.util.HttpConstants;
 import org.jooq.Record;
-import org.jooq.Record1;
 import org.jooq.Result;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.nd4j.shade.jackson.core.JsonProcessingException;
+import org.nd4j.shade.jackson.core.type.TypeReference;
 import org.nd4j.shade.jackson.databind.ObjectMapper;
-import org.superbiz.HelloDL4J;
 import org.superbiz.db.ConnAndDSL;
 import org.superbiz.fetch.model.MarketWatchData;
 import org.superbiz.util.DateConverter;
 import org.superbiz.util.DiffFinder;
 import org.superbiz.util.GlobalInit;
-import org.superbiz.util.LoggingConfig;
-import org.yaml.snakeyaml.error.Mark;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -45,6 +37,8 @@ import static org.superbiz.model.jooq.Tables.SECURITY;
 public class FetchMarketWatch {
 
     public static final int PRICE_SCALE = 2;
+    public static final TypeReference<List<MarketWatchData>> VALUE_TYPE_REF = new TypeReference<List<MarketWatchData>>() {
+    };
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -112,7 +106,8 @@ public class FetchMarketWatch {
                             if (diffMarketWatchData.isPresent()) {
                                 String json = fetchMarketWatch.convertDiffToJson(diffMarketWatchData.get());
                                 LOGGER.info(String.format("Difference for %s: %s", symbol, json));
-                                marketWatchData.setHistory(String.format("[%s]", json));
+                                //marketWatchData.setHistory(String.format("[%s]", json));
+                                marketWatchData.setHistory(fetchMarketWatch.newHistory(marketWatchData, diffMarketWatchData.get()));
                                 fetchMarketWatch.updateAll(dsl, marketWatchData);
                             } else {
                                 fetchMarketWatch.updateLastUpdate(dsl, marketWatchData);
@@ -126,6 +121,35 @@ public class FetchMarketWatch {
                     throw new RuntimeException(e);
                 }
             });
+        }
+    }
+
+    String newHistory(MarketWatchData marketWatchData, MarketWatchData diffMarketWatchData) {
+        List<MarketWatchData> result = new ArrayList<>();
+        List<MarketWatchData> diffs = unmarshallHistoryRecords(marketWatchData);
+        result.add(diffMarketWatchData);
+        result.addAll(diffs);
+        String json = marshallHistoryRecords(result);
+        return json;
+    }
+
+    String marshallHistoryRecords(List<MarketWatchData> diffs) {
+        try {
+            return objectMapper.writeValueAsString(diffs);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    List<MarketWatchData> unmarshallHistoryRecords(MarketWatchData marketWatchData) {
+        if (marketWatchData.getHistory() == null) {
+            return Collections.emptyList();
+        } else {
+            try {
+                return objectMapper.readValue(marketWatchData.getHistory(), VALUE_TYPE_REF);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

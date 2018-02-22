@@ -147,4 +147,57 @@ public class FetchMarketWatchTest {
         assertNotNull(json);
         System.out.println(json);
     }
+
+    @Test
+    public void testMarshallHistoryRecords() {
+        MarketWatchData diffMarketWatchData = aMarketWatchData()
+                .withSymbol("AMZN")
+                .withTargetPrice(new BigDecimal("1234.50"))
+                .withLastUpdated(LocalDate.parse("2017-01-01"))
+                .build();
+
+        List<MarketWatchData> marketWatchDataList = Arrays.asList(diffMarketWatchData);
+        String json = fetchMarketWatch.marshallHistoryRecords(marketWatchDataList);
+        assertNotNull(json);
+        assertEquals("[{\"symbol\":\"AMZN\",\"targetPrice\":1234.50,\"lastUpdated\":\"2017-01-01\"}]", json);
+    }
+
+    @Test
+    public void unmarshallHistoryRecords() {
+        MarketWatchData marketWatchData = aMarketWatchData()
+                .build();
+        List<MarketWatchData> marketWatchDataList = fetchMarketWatch.unmarshallHistoryRecords(marketWatchData);
+        assertNotNull(marketWatchDataList);
+        assertEquals(0, marketWatchDataList.size());
+
+        marketWatchData = aMarketWatchData()
+                .withHistory("[{\"symbol\":\"AMZN\",\"targetPrice\":1234.50,\"lastUpdated\":\"2017-01-01\"}]")
+                .build();
+        marketWatchDataList = fetchMarketWatch.unmarshallHistoryRecords(marketWatchData);
+        assertNotNull(marketWatchDataList);
+        assertEquals(1, marketWatchDataList.size());
+        assertEquals("AMZN", marketWatchDataList.get(0).getSymbol());
+    }
+
+    @Test
+    public void testNewHistory() {
+        MarketWatchData emptyHistory = aMarketWatchData()
+                .build();
+        MarketWatchData diffMarketWatchData = aMarketWatchData()
+                .withTargetPrice(new BigDecimal("1234.50"))
+                .withLastUpdated(LocalDate.parse("2017-01-01"))
+                .build();
+
+        String newHistory = fetchMarketWatch.newHistory(emptyHistory, diffMarketWatchData);
+
+        assertEquals("[{\"targetPrice\":1234.50,\"lastUpdated\":\"2017-01-01\"}]", newHistory);
+
+        MarketWatchData someHistory = aMarketWatchData()
+                .withHistory("[{\"targetPrice\":1234.40,\"lastUpdated\":\"2016-12-31\"}]")
+                .build();
+
+        newHistory = fetchMarketWatch.newHistory(someHistory, diffMarketWatchData);
+
+        assertEquals("[{\"targetPrice\":1234.50,\"lastUpdated\":\"2017-01-01\"},{\"targetPrice\":1234.40,\"lastUpdated\":\"2016-12-31\"}]", newHistory);
+    }
 }
