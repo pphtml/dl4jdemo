@@ -92,7 +92,7 @@ public class FetchMarketWatch {
                 ListenableFuture<Response> responseFuture = client.executeRequest(getRequest);
                 try {
                     Response response = responseFuture.get();
-                    LOGGER.info(String.format("%s --> %s", symbol, response.getStatusCode()));
+                    LOGGER.info(String.format("%s -> %s", symbol, response.getStatusCode()));
 
                     try {
                         MarketWatchData marketWatchData = fetchMarketWatch.parseHtmlPage(symbol, response.getResponseBody(), url);
@@ -107,7 +107,7 @@ public class FetchMarketWatch {
                                 String json = fetchMarketWatch.convertDiffToJson(diffMarketWatchData.get());
                                 LOGGER.info(String.format("Difference for %s: %s", symbol, json));
                                 //marketWatchData.setHistory(String.format("[%s]", json));
-                                marketWatchData.setHistory(fetchMarketWatch.newHistory(marketWatchData, diffMarketWatchData.get()));
+                                marketWatchData.setHistory(fetchMarketWatch.newHistory(oldMarketWatchData, diffMarketWatchData.get()));
                                 fetchMarketWatch.updateAll(dsl, marketWatchData);
                             } else {
                                 fetchMarketWatch.updateLastUpdate(dsl, marketWatchData);

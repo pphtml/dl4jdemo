@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 public class HelloDL4J {
     static {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
-        System.setProperty("org.jooq.no-logo", "true");
     }
 
     private static final Logger LOGGER = Logger.getLogger(HelloDL4J.class.getName());

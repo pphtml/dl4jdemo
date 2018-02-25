@@ -21,6 +21,9 @@ import org.superbiz.util.LoggingConfig;
 
 import java.util.logging.Logger;
 
+/**
+ * Adapted from https://github.com/deeplearning4j/dl4j-examples.git
+ */
 public class XorExample {
     static {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());

@@ -31,9 +31,10 @@ public class NetFetcherYahoo {
 //                interval=interval,
 //                indicators=indicators.replace('|', '%7C'))
 
-        String urlTemplate = "https://query2.finance.yahoo.com/v7/finance/chart/%s?" +
-                "period2=%d&" +
+        String urlTemplate = "https://query1.finance.yahoo.com/v8/finance/chart/%s?" +
+                "symbol=%s&" +
                 "period1=%d&" +
+                "period2=%d&" +
                 "interval=5m&" +
                 "indicators=quote&" +
                 "includeTimestamps=true&" +
@@ -42,8 +43,9 @@ public class NetFetcherYahoo {
                 "corsDomain=finance.yahoo.com";
         String url = String.format(urlTemplate,
                 symbol,
-                DateConverter.toEpochSeconds(dateEnd),
-                DateConverter.toEpochSeconds(dateStart));
+                symbol,
+                DateConverter.toEpochSeconds(dateStart),
+                DateConverter.toEpochSeconds(dateEnd));
         System.out.println(url);
     }
 
