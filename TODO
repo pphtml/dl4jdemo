@@ -1,7 +1,13 @@
-- aktualizace na v8 - https://query1.finance.yahoo.com/v8/finance/chart/AMZN?symbol=AMZN&period1=1454281200&period2=1486508400&interval=1d&includePrePost=true&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com
+- https://query1.finance.yahoo.com/v8/finance/chart/BF.B?symbol=BF.B&period1=1514505600&period2=1519689600&interval=5m&indicators=quote&includeTimestamps=true&includePrePost=false&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com
+- merge Price
+  - porovnani uz ulozenych dat
+- 204.80K loaded
+- yahoo events
+- guice
+  - db connection
 - automaticke trideni classes na konec
+- cross validation
 - entita price
-- UserAgent
 - readFromDB - timezone & timestamp
 - marketwatch data
   - status
@@ -28,5 +34,11 @@
 - MLP classifier linear / moon / saturn - MLPClassifierLinear
 - rnn - basic example - BasicRNNExample
 - rnn - UCISequenceClassificationExample
+- https://github.com/josej30/Neural-Network
+- https://github.com/bentorfs/AI-algorithms
+- https://github.com/Jasonnor/Backpropagation/blob/master/src/Backpropagation/Algorithm/NeuralNetwork.java
+- https://github.com/bernii/NeuralNetwokPerceptronKohonen/blob/master/BackPropagation.java - matice
+- https://stackoverflow.com/questions/27280750/trouble-understanding-the-backpropagation-algorithm-in-neural-network
+- https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
 
 JDBC_DATABASE_URL=$JDBC_DE mvn install

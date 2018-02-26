@@ -16,6 +16,7 @@ import org.superbiz.fetch.model.MarketWatchData;
 import org.superbiz.util.DateConverter;
 import org.superbiz.util.DiffFinder;
 import org.superbiz.util.GlobalInit;
+import org.superbiz.util.HttpUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -53,8 +54,7 @@ public class FetchMarketWatch {
     private static final FetchMarketWatch fetchMarketWatch = new FetchMarketWatch();
 
     public static void main(String[] args) throws IOException {
-        DefaultAsyncHttpClientConfig.Builder clientBuilder = Dsl.config()
-                .setConnectTimeout(10000);
+        DefaultAsyncHttpClientConfig.Builder clientBuilder = HttpUtils.getHttpAgentBuilder();
         LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
 
         try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder);

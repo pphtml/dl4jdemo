@@ -47,7 +47,6 @@ public class Test {
 // 0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
             Schema schema = createSchema()
                 .addColumn(classNamed("survived").setDataType(DataType.INTEGER).setCategorical(true).skipCategoricalMapping())
-                //.addColumn(featureNamed("pclass").oneHot())
                 .addColumn(featureNamed("pclass").setCategorical(true).oneHot())
                 .addColumn(named("name"))
                 .addColumn(featureNamed("sex").setCategorical(true).oneHot())
@@ -82,9 +81,9 @@ public class Test {
             int SECOND_LAYER_WIDTH = 8;
             MultiLayerConfiguration configuration
                     = new NeuralNetConfiguration.Builder()
-                    .iterations(2000)
-                    .activation(Activation.RELU)
-                    .weightInit(WeightInit.RELU)
+                    .iterations(1000)
+                    .activation(Activation.TANH)
+                    .weightInit(WeightInit.XAVIER)
                     .learningRate(0.1)
                     .regularization(true).l2(0.0002)
                     .list()

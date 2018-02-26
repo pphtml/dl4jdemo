@@ -6,6 +6,7 @@ public class YahooData {
     YahooMeta meta;
     List<Long> timestamp;
     YahooIndicators indicators;
+    YahooEvents events;
 
     public YahooMeta getMeta() {
         return meta;
@@ -29,5 +30,13 @@ public class YahooData {
 
     public void setIndicators(YahooIndicators indicators) {
         this.indicators = indicators;
+    }
+
+    public YahooEvents getEvents() {
+        return events;
+    }
+
+    public void setEvents(YahooEvents events) {
+        this.events = events;
     }
 }

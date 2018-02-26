@@ -8,7 +8,7 @@ public class YahooQuote {
     private List<BigDecimal> high;
     private List<BigDecimal> low;
     private List<BigDecimal> close;
-    private List<BigDecimal> volume;
+    private List<Long> volume;
 
     public List<BigDecimal> getLow() {
         return low;
@@ -42,11 +42,11 @@ public class YahooQuote {
         this.close = close;
     }
 
-    public List<BigDecimal> getVolume() {
+    public List<Long> getVolume() {
         return volume;
     }
 
-    public void setVolume(List<BigDecimal> volume) {
+    public void setVolume(List<Long> volume) {
         this.volume = volume;
     }
 }

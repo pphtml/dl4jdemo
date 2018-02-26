@@ -1,6 +1,7 @@
 package org.superbiz.util;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,5 +35,9 @@ public class DateConverter {
 
     public static long toEpochSeconds(LocalDate date) {
         return date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+    }
+
+    public static Timestamp from(LocalDateTime date) {
+        return new Timestamp(date.toEpochSecond(ZoneOffset.UTC));
     }
 }

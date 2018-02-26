@@ -36,8 +36,8 @@ CREATE TABLE price
   symbol VARCHAR(10) NOT NULL
     CONSTRAINT price_pkey
     PRIMARY KEY,
-  last TEXT NOT NULL,
-  history TEXT,
-  last_updated DATETIME NOT NULL
+  data TEXT NOT NULL,
+  last_error TEXT,
+  last_updated TIMESTAMP NOT NULL
 );
 
