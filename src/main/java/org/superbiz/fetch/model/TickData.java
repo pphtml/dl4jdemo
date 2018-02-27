@@ -1,9 +1,11 @@
 package org.superbiz.fetch.model;
 
 import org.nd4j.shade.jackson.annotation.JsonProperty;
+import org.nd4j.shade.jackson.core.JsonProcessingException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 public class TickData {
     private Long timestamp;
@@ -20,6 +22,9 @@ public class TickData {
         this.low = low;
         this.close = close;
         this.volume = volume;
+    }
+
+    public TickData() {
     }
 
     public static TickData from(Long timestamp, BigDecimal open, BigDecimal high, BigDecimal low,

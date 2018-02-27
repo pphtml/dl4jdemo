@@ -21,9 +21,11 @@
         <version.jooq>3.10.5</version.jooq>
         <jfreechart.version>1.0.13</jfreechart.version>
         <jcommon.version>1.0.23</jcommon.version>
-        <version.ratpack>1.5.0</version.ratpack>
+        <!--<version.ratpack>1.5.0</version.ratpack>-->
         <!--<dl4j.spark.version>0.9.1_spark_1</dl4j.spark.version>-->
         <!--<datavec.spark.version>0.9.1_spark_1</datavec.spark.version>-->
+        <guice.version>4.1.0</guice.version>
+        <HikariCP.version>2.7.6</HikariCP.version>
     </properties>
 
     <build>
@@ -116,26 +118,16 @@
         </dependency>
 
         <dependency>
-            <groupId>io.ratpack</groupId>
-            <artifactId>ratpack-core</artifactId>
-            <version>${version.ratpack}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ratpack</groupId>
-            <artifactId>ratpack-test</artifactId>
-            <version>${version.ratpack}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ratpack</groupId>
-            <artifactId>ratpack-hikari</artifactId>
-            <version>${version.ratpack}</version>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.google.inject</groupId>-->
-            <!--<artifactId>guice</artifactId>-->
-            <!--<version>4.1.0</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${HikariCP.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jsoup</groupId>

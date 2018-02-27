@@ -21,7 +21,7 @@ public class NetFetcherYahooTest {
         //String data = Utils.readResourceToString(getClass(), "AMZN_5m.data.json");
 
         ParsingResult result = netFetcherYahoo.processData(data);
-        final String jsonString = result.asJson();
+        //final String jsonString = result.asJson();
     }
 
     @Test

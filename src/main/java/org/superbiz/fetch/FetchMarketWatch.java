@@ -39,8 +39,8 @@ import static org.superbiz.model.jooq.Tables.SECURITY;
 
 public class FetchMarketWatch {
 
-    public static final int PRICE_SCALE = 2;
-    public static final TypeReference<List<MarketWatchData>> VALUE_TYPE_REF = new TypeReference<List<MarketWatchData>>() {
+    private static final int PRICE_SCALE = 2;
+    private static final TypeReference<List<MarketWatchData>> VALUE_TYPE_REF = new TypeReference<List<MarketWatchData>>() {
     };
 
     static { GlobalInit.init(); }

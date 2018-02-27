@@ -1,12 +1,15 @@
 package org.superbiz.dto;
 
+import org.superbiz.fetch.model.TickData;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PriceDTO {
     private String symbol;
     private String lastError;
     private LocalDateTime lastUpdated;
-    private String data;
+    private List<TickData> data;
     private LocalDateTime lastUpdatedError;
 
     public String getSymbol() {
@@ -33,11 +36,11 @@ public class PriceDTO {
         this.lastUpdated = lastUpdated;
     }
 
-    public String getData() {
+    public List<TickData> getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(List<TickData> data) {
         this.data = data;
     }
 
@@ -54,7 +57,7 @@ public class PriceDTO {
         private String symbol;
         private String lastError;
         private LocalDateTime lastUpdated;
-        private String data;
+        private List<TickData> data;
         private LocalDateTime lastUpdatedError;
 
         private PriceDTOBuilder() {
@@ -79,7 +82,7 @@ public class PriceDTO {
             return this;
         }
 
-        public PriceDTOBuilder withData(String data) {
+        public PriceDTOBuilder withData(List<TickData> data) {
             this.data = data;
             return this;
         }

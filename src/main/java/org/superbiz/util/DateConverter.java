@@ -9,6 +9,8 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 
 public class DateConverter {
+    // https://stackoverflow.com/questions/8992282/convert-localdate-to-localdatetime-or-java-sql-timestamp
+
     public static Date from(Optional<LocalDate> optionalDate) {
         if (optionalDate.isPresent()) {
             return from(optionalDate.get());
@@ -37,7 +39,11 @@ public class DateConverter {
         return date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
     }
 
-    public static Timestamp from(LocalDateTime dateTime) {
+    public static Timestamp fromLocalDateTime(LocalDateTime dateTime) {
         return dateTime != null ? Timestamp.valueOf(dateTime) : null;
+    }
+
+    public static LocalDateTime toLocalDateTime(Timestamp timestamp) {
+        return timestamp != null ? timestamp.toLocalDateTime() : null;
     }
 }

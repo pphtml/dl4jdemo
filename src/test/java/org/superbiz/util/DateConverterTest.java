@@ -24,7 +24,7 @@ public class DateConverterTest extends TestCase {
 
     public void testFrom() {
         LocalDateTime dateTime = LocalDateTime.parse("2018-02-27T11:12:13");
-        Timestamp sql = DateConverter.from(dateTime);
+        Timestamp sql = DateConverter.fromLocalDateTime(dateTime);
         assertEquals("2018-02-27 11:12:13.0", sql.toString());
     }
 }

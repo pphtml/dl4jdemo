@@ -45,6 +45,11 @@ public class FetchData {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
         fetchData.fetchAll();
+        //PriceDTO price = fetchData.readFromDB("AMZN");
+    }
+
+    private PriceDTO readFromDB(String symbol) {
+        return price5mDAO.read(symbol);
     }
 
     private void fetchAll() throws IOException {
@@ -66,7 +71,7 @@ public class FetchData {
                     PriceDTO priceDTO = createPriceDTO()
                             .withSymbol(symbol)
                             .withLastUpdated(LocalDateTime.now())
-                            .withData(parsedResult.asJson())
+                            .withData(parsedResult.getTickData())
                             .withLastUpdatedError(null)
                             .withLastError(null)
                             .build();
@@ -84,5 +89,6 @@ public class FetchData {
                 }
             });
         }
+        LOGGER.info("Finished");
     }
 }

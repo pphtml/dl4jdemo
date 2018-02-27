@@ -1,5 +1,5 @@
 - vicevlaknovost pro marketwatch
-- ukladat S&P 500 index - ^GSPC
+- DateConverter - https://stackoverflow.com/questions/8992282/convert-localdate-to-localdatetime-or-java-sql-timestamp
 - TickData do testu - resource
 - merge Price
   - porovnani uz ulozenych dat

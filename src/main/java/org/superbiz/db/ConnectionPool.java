@@ -25,15 +25,14 @@ public class ConnectionPool {
     public static HikariDataSource getDataSource() {
         HikariConfig jdbcConfig = new HikariConfig();
         jdbcConfig.setPoolName("MyHikariCP");
-        jdbcConfig.setMaximumPoolSize(20);
+        jdbcConfig.setMaximumPoolSize(4);
+        jdbcConfig.setMinimumIdle(2);
         //jdbcConfig.setMinimumIdle(conf.getInt("minimumIdle"));
         String url = System.getenv("JDBC_DATABASE_URL");
         if (url == null || url.length() == 0) {
             throw new RuntimeException("JDBC_DATABASE_URL is supposed to be provided.");
         }
         jdbcConfig.setJdbcUrl(url);
-//        jdbcConfig.setUsername(conf.getString("username"));
-//        jdbcConfig.setPassword(conf.getString("password"));
         jdbcConfig.addDataSourceProperty("cachePrepStmts", true);
         jdbcConfig.addDataSourceProperty("prepStmtCacheSize", true);
 //        jdbcConfig.addDataSourceProperty("prepStmtCacheSqlLimit", conf.getInt("prepStmtCacheSqlLimit"));
