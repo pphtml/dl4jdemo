@@ -2,7 +2,7 @@ package org.superbiz.fetch.model;
 
 public class YahooResult {
     YahooChart chart;
-    YahooError error;
+    //YahooError error;
 
     public YahooChart getChart() {
         return chart;
@@ -12,11 +12,11 @@ public class YahooResult {
         this.chart = chart;
     }
 
-    public YahooError getError() {
-        return error;
-    }
-
-    public void setError(YahooError error) {
-        this.error = error;
-    }
+//    public YahooError getError() {
+//        return error;
+//    }
+//
+//    public void setError(YahooError error) {
+//        this.error = error;
+//    }
 }

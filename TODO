@@ -1,13 +1,11 @@
-- https://query1.finance.yahoo.com/v8/finance/chart/BF.B?symbol=BF.B&period1=1514505600&period2=1519689600&interval=5m&indicators=quote&includeTimestamps=true&includePrePost=false&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com
+- vicevlaknovost pro marketwatch
+- ukladat S&P 500 index - ^GSPC
+- TickData do testu - resource
 - merge Price
   - porovnani uz ulozenych dat
-- 204.80K loaded
 - yahoo events
-- guice
-  - db connection
 - automaticke trideni classes na konec
 - cross validation
-- entita price
 - readFromDB - timezone & timestamp
 - marketwatch data
   - status
@@ -20,16 +18,15 @@
   - poresit DB
 - referencni integrita
 - paralelni cteni - omezit na pocet vlaken
-- ukladat S&P 500 index
 - initial data dump
 - initial data load script
 - automaticka kopie dat
 - jsonwrite - poradi - lastupdate na prvni misto
+- vypusteni quoted atributu?, gzip pro ukladana data?
 
 
 - xor priklad - XorExample
 - rekonstrukce funkce - RegressionMathFunctions
-- titanic data
 - house prices
 - MLP classifier linear / moon / saturn - MLPClassifierLinear
 - rnn - basic example - BasicRNNExample

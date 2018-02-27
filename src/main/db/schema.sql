@@ -1,11 +1,16 @@
-CREATE TABLE security
+
+
+create table security
 (
-  symbol        VARCHAR(10) NOT NULL
-    CONSTRAINT security_pkey
-    PRIMARY KEY,
-  name          VARCHAR(64) NOT NULL,
-  enlisted_date DATE
+  symbol varchar(10) not null
+    constraint security_pkey
+    primary key,
+  name varchar(64) not null,
+  enlisted_date date,
+  index boolean default false not null
 );
+
+
 
 CREATE TABLE marketwatch
 (
@@ -31,13 +36,25 @@ CREATE TABLE marketwatch
   history TEXT
 );
 
-CREATE TABLE price
+CREATE TABLE price_5m
 (
   symbol VARCHAR(10) NOT NULL
-    CONSTRAINT price_pkey
+    CONSTRAINT price_pkey_5m
     PRIMARY KEY,
   data TEXT NOT NULL,
+  last_updated TIMESTAMP,
   last_error TEXT,
-  last_updated TIMESTAMP NOT NULL
+  last_updated_error TIMESTAMP
 );
+
+
+
+CREATE TABLE employee
+(
+  id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR NOT NULL,
+  age INT NOT NULL
+);
+CREATE UNIQUE INDEX employee_id_uindex ON employee (id);
+
 

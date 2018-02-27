@@ -1,17 +1,19 @@
 package org.superbiz.fetch;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.asynchttpclient.*;
 import org.asynchttpclient.util.HttpConstants;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.superbiz.dao.PriceDAO;
+import org.superbiz.dao.Price5mDAO;
 import org.superbiz.dao.SecurityDAO;
-import org.superbiz.db.ConnAndDSL;
 import org.superbiz.dto.PriceDTO;
 import org.superbiz.fetch.model.ParsingResult;
+import org.superbiz.guice.BasicModule;
 import org.superbiz.util.GlobalInit;
-import org.superbiz.util.HttpUtils;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
@@ -22,23 +24,33 @@ import static org.superbiz.dto.PriceDTO.PriceDTOBuilder.createPriceDTO;
 import static org.superbiz.model.jooq.Tables.SECURITY;
 
 public class FetchData {
-    private static final GlobalInit globalInit = new GlobalInit();
-    private static final Logger LOGGER = Logger.getLogger(FetchData.class.getName());
+    static { GlobalInit.init(); }
 
-    private NetFetcherYahoo netFetcherYahoo = new NetFetcherYahoo();
-    //private SecurityDAO securityDAO = new SecurityDAO();
-    private PriceDAO priceDAO = new PriceDAO();
+    @Inject
+    Logger LOGGER;
+
+    @Inject
+    NetFetcherYahoo netFetcherYahoo = new NetFetcherYahoo();
+
+    @Inject
+    DefaultAsyncHttpClientConfig.Builder clientBuilder;
+
+    @Inject
+    SecurityDAO securityDAO;
+
+    @Inject
+    Price5mDAO price5mDAO;
 
     public static void main(String[] args) throws IOException {
-        new FetchData().fetchAll();
+        Injector injector = Guice.createInjector(new BasicModule());
+        FetchData fetchData = injector.getInstance(FetchData.class);
+        fetchData.fetchAll();
     }
 
     private void fetchAll() throws IOException {
-        DefaultAsyncHttpClientConfig.Builder clientBuilder = HttpUtils.getHttpAgentBuilder();
-
-        try (ConnAndDSL dsl = ConnAndDSL.create();
-            AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
-            Result<Record> securities = dsl.getDsl().select().from(SECURITY).orderBy(SECURITY.SYMBOL).fetch();
+        LOGGER.info("Starting");
+        try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
+            Result<Record> securities = securityDAO.fetchAll();
             securities.stream().forEach(security -> {
                 String symbol = security.get(SECURITY.SYMBOL);
                 String url = netFetcherYahoo.createUrl(symbol);
@@ -51,19 +63,26 @@ public class FetchData {
                     Response response = responseFuture.get();
                     LOGGER.info(String.format("%s -> %s (%s)", symbol, response.getStatusCode(), url));
                     ParsingResult parsedResult = netFetcherYahoo.processData(response.getResponseBody());
-                    // LOGGER.info(String.format("%s", parsedResult.asJson()));
                     PriceDTO priceDTO = createPriceDTO()
                             .withSymbol(symbol)
                             .withLastUpdated(LocalDateTime.now())
                             .withData(parsedResult.asJson())
+                            .withLastUpdatedError(null)
+                            .withLastError(null)
                             .build();
-                    priceDAO.insertOrUpdate(dsl, priceDTO);
-                } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.log(Level.SEVERE, String.format("Cannot read Trading Tick data for %s", security), e);
-                    throw new RuntimeException(e);
+                    price5mDAO.insertOrUpdate(priceDTO);
+                } catch (InterruptedException | ExecutionException | DataProcessingException e) {
+                    LOGGER.log(Level.WARNING, String.format("Cannot read Trading Tick data for %s, reason: %s",
+                            symbol, e.getMessage()), e);
+                    String errorMessageForDB = String.format("%s: %s", e.getClass(), e.getMessage());
+                    PriceDTO priceDTO = createPriceDTO()
+                            .withSymbol(symbol)
+                            .withLastUpdatedError(LocalDateTime.now())
+                            .withLastError(errorMessageForDB)
+                            .build();
+                    price5mDAO.insertOrUpdateError(priceDTO);
                 }
             });
         }
     }
-
 }

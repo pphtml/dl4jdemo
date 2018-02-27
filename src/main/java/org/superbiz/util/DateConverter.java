@@ -37,7 +37,7 @@ public class DateConverter {
         return date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
     }
 
-    public static Timestamp from(LocalDateTime date) {
-        return new Timestamp(date.toEpochSecond(ZoneOffset.UTC));
+    public static Timestamp from(LocalDateTime dateTime) {
+        return dateTime != null ? Timestamp.valueOf(dateTime) : null;
     }
 }

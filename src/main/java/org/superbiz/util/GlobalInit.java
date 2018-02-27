@@ -5,4 +5,7 @@ public class GlobalInit {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
         System.setProperty("org.jooq.no-logo", "true");
     }
+
+    public static void init() {
+    }
 }

@@ -45,74 +45,31 @@ public class FetchMarketWatchTest {
         assertEquals(new Integer(0), marketWatchData.getSell());
     }
 
-    @Test
-    @Ignore
-    public void testStoreToDB() throws ParsingException {
-        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+//    @Test
+//    @Ignore
+//    public void testStoreToDB() throws ParsingException {
+//        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+//
+//        String body = readResourceToString(getClass(), "AMZN_MarketWatch.html");
+//        final MarketWatchData marketWatchData = fetchMarketWatch.parseHtmlPage("AMZN", body, null);
+//        marketWatchData.setLastUpdated(currentDate);
+//
+//        try (ConnAndDSL dsl = ConnAndDSL.create()) {
+//            fetchMarketWatch.storeToDB(dsl, marketWatchData);
+//        }
+//    }
 
-        String body = readResourceToString(getClass(), "AMZN_MarketWatch.html");
-        final MarketWatchData marketWatchData = fetchMarketWatch.parseHtmlPage("AMZN", body, null);
-        marketWatchData.setLastUpdated(currentDate);
-
-        try (ConnAndDSL dsl = ConnAndDSL.create()) {
-            fetchMarketWatch.storeToDB(dsl, marketWatchData);
-        }
-    }
-
-    @Test
-    @Ignore
-    public void testReadFromDB() {
-        final List<String> symbols = Arrays.asList("AMZN");
-        try (ConnAndDSL dsl = ConnAndDSL.create()) {
-            Map<String, MarketWatchData> map = fetchMarketWatch.readFromDB(dsl, symbols);
-
-            assertNotNull(map);
-            assertTrue(map.containsKey("AMZN"));
-            MarketWatchData marketWatchData = map.get("AMZN");
-
-            assertNotNull(marketWatchData);
-
-            assertEquals("AMZN", marketWatchData.getSymbol());
-            assertEquals("Buy", marketWatchData.getRecommendation());
-            assertEquals(new BigDecimal("1661.00"), marketWatchData.getTargetPrice());
-            assertEquals(new Integer(48), marketWatchData.getNumberOfRatings());
-            assertEquals(new BigDecimal("1.26"), marketWatchData.getQuartersEstimate());
-            assertEquals(new BigDecimal("8.40"), marketWatchData.getYearsEstimate());
-            assertEquals(new BigDecimal("2.16"), marketWatchData.getLastQuarterEarnings());
-            assertEquals(new BigDecimal("176.21"), marketWatchData.getMedianPeOnCy());
-            assertEquals(new BigDecimal("4.29"), marketWatchData.getYearAgoEarnings());
-            assertEquals(new BigDecimal("15.34"), marketWatchData.getNextFiscalYear());
-            assertEquals(new BigDecimal("95.15"), marketWatchData.getMedianPeNextFy());
-
-            assertEquals(new Integer(39), marketWatchData.getBuy());
-            assertEquals(new Integer(5), marketWatchData.getOverweight());
-            assertEquals(new Integer(4), marketWatchData.getHold());
-            assertEquals(new Integer(1), marketWatchData.getUnderweight());
-            assertEquals(new Integer(0), marketWatchData.getSell());
-        }
-    }
-
-    @Test
-    @Ignore
-    public void testComputeDiff() throws ParsingException {
-        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
-        final String symbol = "AMZN";
-        final List<String> symbols = Arrays.asList(symbol);
-        try (ConnAndDSL dsl = ConnAndDSL.create()) {
-            Map<String, MarketWatchData> map = fetchMarketWatch.readFromDB(dsl, symbols);
-
-            assertNotNull(map);
-            assertTrue(map.containsKey(symbol));
-            MarketWatchData oldMarketWatchData = map.get(symbol);
-
-            String body = readResourceToString(getClass(), "AMZN_MarketWatch_2.html");
-            final MarketWatchData newMarketWatchData = fetchMarketWatch.parseHtmlPage(symbol, body, null);
-            newMarketWatchData.setLastUpdated(currentDate);
-            assertNotNull(newMarketWatchData);
-
-            Optional<MarketWatchData> diffMarketWatchData = fetchMarketWatch.computeDiff(oldMarketWatchData, newMarketWatchData);
-            System.out.println(diffMarketWatchData);
-
+//    @Test
+//    @Ignore
+//    public void testReadFromDB() {
+//        final List<String> symbols = Arrays.asList("AMZN");
+//        try (ConnAndDSL dsl = ConnAndDSL.create()) {
+//            Map<String, MarketWatchData> map = fetchMarketWatch.readFromDB(dsl, symbols);
+//
+//            assertNotNull(map);
+//            assertTrue(map.containsKey("AMZN"));
+//            MarketWatchData marketWatchData = map.get("AMZN");
+//
 //            assertNotNull(marketWatchData);
 //
 //            assertEquals("AMZN", marketWatchData.getSymbol());
@@ -132,8 +89,32 @@ public class FetchMarketWatchTest {
 //            assertEquals(new Integer(4), marketWatchData.getHold());
 //            assertEquals(new Integer(1), marketWatchData.getUnderweight());
 //            assertEquals(new Integer(0), marketWatchData.getSell());
-        }
-    }
+//        }
+//    }
+
+//    @Test
+//    @Ignore
+//    public void testComputeDiff() throws ParsingException {
+//        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+//        final String symbol = "AMZN";
+//        final List<String> symbols = Arrays.asList(symbol);
+//        try (ConnAndDSL dsl = ConnAndDSL.create()) {
+//            Map<String, MarketWatchData> map = fetchMarketWatch.readFromDB(dsl, symbols);
+//
+//            assertNotNull(map);
+//            assertTrue(map.containsKey(symbol));
+//            MarketWatchData oldMarketWatchData = map.get(symbol);
+//
+//            String body = readResourceToString(getClass(), "AMZN_MarketWatch_2.html");
+//            final MarketWatchData newMarketWatchData = fetchMarketWatch.parseHtmlPage(symbol, body, null);
+//            newMarketWatchData.setLastUpdated(currentDate);
+//            assertNotNull(newMarketWatchData);
+//
+//            Optional<MarketWatchData> diffMarketWatchData = fetchMarketWatch.computeDiff(oldMarketWatchData, newMarketWatchData);
+//            System.out.println(diffMarketWatchData);
+//
+//        }
+//    }
 
     @Test
     public void testConvertDiffToJson() {

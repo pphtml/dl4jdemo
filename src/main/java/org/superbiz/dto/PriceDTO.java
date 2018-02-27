@@ -7,6 +7,7 @@ public class PriceDTO {
     private String lastError;
     private LocalDateTime lastUpdated;
     private String data;
+    private LocalDateTime lastUpdatedError;
 
     public String getSymbol() {
         return symbol;
@@ -40,12 +41,21 @@ public class PriceDTO {
         this.data = data;
     }
 
+    public LocalDateTime getLastUpdatedError() {
+        return lastUpdatedError;
+    }
+
+    public void setLastUpdatedError(LocalDateTime lastUpdatedError) {
+        this.lastUpdatedError = lastUpdatedError;
+    }
+
 
     public static final class PriceDTOBuilder {
         private String symbol;
         private String lastError;
         private LocalDateTime lastUpdated;
         private String data;
+        private LocalDateTime lastUpdatedError;
 
         private PriceDTOBuilder() {
         }
@@ -74,12 +84,18 @@ public class PriceDTO {
             return this;
         }
 
+        public PriceDTOBuilder withLastUpdatedError(LocalDateTime lastUpdatedError) {
+            this.lastUpdatedError = lastUpdatedError;
+            return this;
+        }
+
         public PriceDTO build() {
             PriceDTO priceDTO = new PriceDTO();
             priceDTO.setSymbol(symbol);
             priceDTO.setLastError(lastError);
             priceDTO.setLastUpdated(lastUpdated);
             priceDTO.setData(data);
+            priceDTO.setLastUpdatedError(lastUpdatedError);
             return priceDTO;
         }
     }

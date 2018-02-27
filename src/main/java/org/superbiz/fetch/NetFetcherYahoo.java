@@ -6,6 +6,7 @@ import org.superbiz.fetch.model.ParsingResult;
 import org.superbiz.fetch.model.TickData;
 import org.superbiz.fetch.model.YahooChart;
 import org.superbiz.fetch.model.YahooData;
+import org.superbiz.fetch.model.YahooError;
 import org.superbiz.fetch.model.YahooIndicators;
 import org.superbiz.fetch.model.YahooQuote;
 import org.superbiz.fetch.model.YahooResult;
@@ -41,6 +42,7 @@ public class NetFetcherYahoo {
 //                interval=interval,
 //                indicators=indicators.replace('|', '%7C'))
 
+        String localSymbol = localSymbol(symbol);
         String urlTemplate = "https://query1.finance.yahoo.com/v8/finance/chart/%s?" +
                 "symbol=%s&" +
                 "period1=%d&" +
@@ -52,19 +54,29 @@ public class NetFetcherYahoo {
                 "events=div%%7Csplit%%7Cearn&" +
                 "corsDomain=finance.yahoo.com";
         String url = String.format(urlTemplate,
-                symbol,
-                symbol,
+                localSymbol,
+                localSymbol,
                 DateConverter.toEpochSeconds(dateStart),
                 DateConverter.toEpochSeconds(dateEnd));
         return url;
+    }
+
+    private String localSymbol(String symbol) {
+        return symbol.replaceAll("\\.", "-");
     }
 
     public ParsingResult processData(String json) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             YahooResult result = objectMapper.readValue(json, YahooResult.class);
-            List<TickData> translatedResult = translateToTickData(result);
-            return ParsingResult.of(translatedResult);
+            if (result.getChart().getError() != null && result.getChart().getError().getCode() != null) {
+                YahooError error = result.getChart().getError();
+                throw new DataProcessingException(String.format("Code: %s, Description: %s",
+                        error.getCode(), error.getDescription()));
+            } else {
+                List<TickData> translatedResult = translateToTickData(result);
+                return ParsingResult.of(translatedResult);
+            }
         } catch (IOException | ParsingException e) {
             throw new RuntimeException(e);
         }

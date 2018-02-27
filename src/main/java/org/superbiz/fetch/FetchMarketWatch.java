@@ -1,5 +1,8 @@
 package org.superbiz.fetch;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.asynchttpclient.*;
 import org.asynchttpclient.util.HttpConstants;
 import org.jooq.Record;
@@ -11,12 +14,12 @@ import org.jsoup.select.Elements;
 import org.nd4j.shade.jackson.core.JsonProcessingException;
 import org.nd4j.shade.jackson.core.type.TypeReference;
 import org.nd4j.shade.jackson.databind.ObjectMapper;
-import org.superbiz.db.ConnAndDSL;
+import org.superbiz.dao.MarketWatchDAO;
+import org.superbiz.dao.SecurityDAO;
 import org.superbiz.fetch.model.MarketWatchData;
-import org.superbiz.util.DateConverter;
+import org.superbiz.guice.BasicModule;
 import org.superbiz.util.DiffFinder;
 import org.superbiz.util.GlobalInit;
-import org.superbiz.util.HttpUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -32,7 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.superbiz.fetch.model.MarketWatchData.MarketWatchDataBuilder.aMarketWatchData;
-import static org.superbiz.model.jooq.Tables.MARKETWATCH;
 import static org.superbiz.model.jooq.Tables.SECURITY;
 
 public class FetchMarketWatch {
@@ -41,47 +43,44 @@ public class FetchMarketWatch {
     public static final TypeReference<List<MarketWatchData>> VALUE_TYPE_REF = new TypeReference<List<MarketWatchData>>() {
     };
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    static { GlobalInit.init(); }
 
+    @Inject
+    Logger LOGGER;
 
-    static { new GlobalInit(); }
+    @Inject
+    DefaultAsyncHttpClientConfig.Builder clientBuilder;
 
-    private static final Logger LOGGER = Logger.getLogger(FetchMarketWatch.class.getName());
+    @Inject
+    ObjectMapper objectMapper;
+
+    @Inject
+    MarketWatchDAO marketWatchDAO;
+
+    @Inject
+    SecurityDAO securityDAO;
 
     //private static final String URL_TEMPLATE = "https://www.marketwatch.com/investing/stock/amzn/analystestimates";
     private static final String URL_TEMPLATE = "https://www.marketwatch.com/investing/stock/%s/analystestimates";
 
-    private static final FetchMarketWatch fetchMarketWatch = new FetchMarketWatch();
-
     public static void main(String[] args) throws IOException {
-        DefaultAsyncHttpClientConfig.Builder clientBuilder = HttpUtils.getHttpAgentBuilder();
+        Injector injector = Guice.createInjector(new BasicModule());
+        FetchMarketWatch fetchMarketWatch = injector.getInstance(FetchMarketWatch.class);
+        fetchMarketWatch.fetchAll();
+    }
+
+    private void fetchAll() throws IOException {
         LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
 
-        try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder);
-             ConnAndDSL dsl = ConnAndDSL.create()) {
-            Map<String, MarketWatchData> marketWatchDataMap = fetchMarketWatch.readFromDB(dsl);
+        try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
+            Map<String, MarketWatchData> marketWatchDataMap = marketWatchDAO.readMap();
             List<String> existingTodaySymbols = marketWatchDataMap.values().stream()
                     .filter(rec -> !rec.getLastUpdated().isBefore(currentDate))
                     .map(rec -> rec.getSymbol())
                     .collect(Collectors.toList());
-//            Result<Record> existingMarketData = dsl.getDsl().select()
-//                    .from(MARKETWATCH)
-//                    //.where(MARKETWATCH.LAST_UPDATED.eq(DateConverter.from(currentDate)))
-//                    .fetch();
-//            List<String> existingMarketDataList = existingMarketData.stream()
-//                    .filter(rec -> {
-//                        return !rec.getValue(MARKETWATCH.LAST_UPDATED).toLocalDate().isBefore(currentDate);
-//                    })
-//                    .map(rec -> rec.getValue(MARKETWATCH.SYMBOL))
-//                    .collect(Collectors.toList());
             LOGGER.info(String.format("MarketWatch data already read for %s: %s", currentDate, existingTodaySymbols));
 
-            Result<Record> securities = dsl.getDsl()
-                    .select()
-                    .from(SECURITY)
-                    .where(SECURITY.SYMBOL.notIn(existingTodaySymbols))
-                    .orderBy(SECURITY.SYMBOL)
-                    .fetch();
+            Result<Record> securities = securityDAO.findAllSecuritiesExcept(existingTodaySymbols);
             securities.stream().forEach(security -> {
                 String symbol = security.getValue(SECURITY.SYMBOL);
                 String url = String.format(URL_TEMPLATE, symbol.toLowerCase());
@@ -95,22 +94,22 @@ public class FetchMarketWatch {
                     LOGGER.info(String.format("%s -> %s", symbol, response.getStatusCode()));
 
                     try {
-                        MarketWatchData marketWatchData = fetchMarketWatch.parseHtmlPage(symbol, response.getResponseBody(), url);
+                        MarketWatchData marketWatchData = this.parseHtmlPage(symbol, response.getResponseBody(), url);
                         marketWatchData.setLastUpdated(currentDate);
 
                         MarketWatchData oldMarketWatchData = marketWatchDataMap.get(symbol);
                         if (oldMarketWatchData == null) {
-                            fetchMarketWatch.storeToDB(dsl, marketWatchData);
+                            marketWatchDAO.storeToDB(marketWatchData);
                         } else {
                             Optional<MarketWatchData> diffMarketWatchData = DiffFinder.computeDiff(oldMarketWatchData, marketWatchData);
                             if (diffMarketWatchData.isPresent()) {
-                                String json = fetchMarketWatch.convertDiffToJson(diffMarketWatchData.get());
+                                String json = this.convertDiffToJson(diffMarketWatchData.get());
                                 LOGGER.info(String.format("Difference for %s: %s", symbol, json));
                                 //marketWatchData.setHistory(String.format("[%s]", json));
-                                marketWatchData.setHistory(fetchMarketWatch.newHistory(oldMarketWatchData, diffMarketWatchData.get()));
-                                fetchMarketWatch.updateAll(dsl, marketWatchData);
+                                marketWatchData.setHistory(this.newHistory(oldMarketWatchData, diffMarketWatchData.get()));
+                                marketWatchDAO.updateAll(marketWatchData);
                             } else {
-                                fetchMarketWatch.updateLastUpdate(dsl, marketWatchData);
+                                marketWatchDAO.updateLastUpdate(marketWatchData);
                             }
                         }
                     } catch (ParsingException e) {
@@ -153,104 +152,21 @@ public class FetchMarketWatch {
         }
     }
 
-    private void updateAll(ConnAndDSL dsl, MarketWatchData marketWatchData) {
-        dsl.getDsl().update(MARKETWATCH)
-                .set(MARKETWATCH.LAST_UPDATED, DateConverter.from(marketWatchData.getLastUpdated()))
-                .set(MARKETWATCH.QUARTERS_ESTIMATE, marketWatchData.getQuartersEstimate())
-                .set(MARKETWATCH.YEARS_ESTIMATE, marketWatchData.getYearsEstimate())
-                .set(MARKETWATCH.MEDIAN_PE_ON_CY, marketWatchData.getMedianPeOnCy())
-                .set(MARKETWATCH.NEXT_FISCAL_YEAR, marketWatchData.getNextFiscalYear())
-                .set(MARKETWATCH.MEDIAN_PE_NEXT_FY, marketWatchData.getMedianPeNextFy())
-                .set(MARKETWATCH.LAST_QUARTER_EARNINGS, marketWatchData.getLastQuarterEarnings())
-                .set(MARKETWATCH.YEAR_AGO_EARNINGS, marketWatchData.getYearAgoEarnings())
-                .set(MARKETWATCH.RECOMMENDATION, marketWatchData.getRecommendation())
-                .set(MARKETWATCH.NUMBER_OF_RATINGS, marketWatchData.getNumberOfRatings())
-                .set(MARKETWATCH.BUY, marketWatchData.getBuy())
-                .set(MARKETWATCH.OVERWEIGHT, marketWatchData.getOverweight())
-                .set(MARKETWATCH.HOLD, marketWatchData.getHold())
-                .set(MARKETWATCH.UNDERWEIGHT, marketWatchData.getUnderweight())
-                .set(MARKETWATCH.SELL, marketWatchData.getSell())
-                .set(MARKETWATCH.TARGET_PRICE, marketWatchData.getTargetPrice())
-                .set(MARKETWATCH.HISTORY, marketWatchData.getHistory())
-                .where(MARKETWATCH.SYMBOL.eq(marketWatchData.getSymbol()))
-                .execute();
-    }
-
-    private void updateLastUpdate(ConnAndDSL dsl, MarketWatchData marketWatchData) {
-        dsl.getDsl().update(MARKETWATCH)
-                .set(MARKETWATCH.LAST_UPDATED, DateConverter.from(marketWatchData.getLastUpdated()))
-                .where(MARKETWATCH.SYMBOL.eq(marketWatchData.getSymbol()))
-                .execute();
-    }
-
-    Map<String, MarketWatchData> readFromDB(ConnAndDSL dsl, List<String> symbols) {
-        Result<Record> marketRecords = dsl.getDsl().select().from(MARKETWATCH).where(MARKETWATCH.SYMBOL.in(symbols)).fetch();
-        final Map<String, MarketWatchData> marketWatchDataMap = marketRecords.stream()
-                .map(m -> recordToMarketWatchData(m))
-                .collect(Collectors.toMap(m -> m.getSymbol(), m -> m));
-        return marketWatchDataMap;
-    }
-
-    Map<String, MarketWatchData> readFromDB(ConnAndDSL dsl) {
-        Result<Record> marketRecords = dsl.getDsl().select().from(MARKETWATCH).fetch();
-        final Map<String, MarketWatchData> marketWatchDataMap = marketRecords.stream()
-                .map(m -> recordToMarketWatchData(m))
-                .collect(Collectors.toMap(m -> m.getSymbol(), m -> m));
-        return marketWatchDataMap;
-    }
-
-    private MarketWatchData recordToMarketWatchData(Record m) {
-        return aMarketWatchData()
-                        .withSymbol(m.getValue(MARKETWATCH.SYMBOL))
-                        .withRecommendation(m.getValue(MARKETWATCH.RECOMMENDATION))
-                        .withTargetPrice(m.getValue(MARKETWATCH.TARGET_PRICE))
-                        .withNumberOfRatings(m.getValue(MARKETWATCH.NUMBER_OF_RATINGS))
-                        .withQuartersEstimate(m.getValue(MARKETWATCH.QUARTERS_ESTIMATE))
-                        .withYearsEstimate(m.getValue(MARKETWATCH.YEARS_ESTIMATE))
-                        .withLastQuarterEarnings(m.getValue(MARKETWATCH.LAST_QUARTER_EARNINGS))
-                        .withMedianPeOnCy(m.getValue(MARKETWATCH.MEDIAN_PE_ON_CY))
-                        .withYearAgoEarnings(m.getValue(MARKETWATCH.YEAR_AGO_EARNINGS))
-                        .withNextFiscalYear(m.getValue(MARKETWATCH.NEXT_FISCAL_YEAR))
-                        .withMedianPeNextFy(m.getValue(MARKETWATCH.MEDIAN_PE_NEXT_FY))
-                        .withBuy(m.getValue(MARKETWATCH.BUY))
-                        .withOverweight(m.getValue(MARKETWATCH.OVERWEIGHT))
-                        .withHold(m.getValue(MARKETWATCH.HOLD))
-                        .withUnderweight(m.getValue(MARKETWATCH.UNDERWEIGHT))
-                        .withSell(m.getValue(MARKETWATCH.SELL))
-                        .withHistory(m.getValue(MARKETWATCH.HISTORY))
-                        .withLastUpdated(m.getValue(MARKETWATCH.LAST_UPDATED).toLocalDate())
-                        .build();
-    }
-
-    void storeToDB(ConnAndDSL dsl, MarketWatchData marketWatchData) {
-//  last_updated DATE NOT NULL,
-//  history TEXT
-        dsl.getDsl().insertInto(MARKETWATCH,
-                MARKETWATCH.SYMBOL,
-                MARKETWATCH.QUARTERS_ESTIMATE,
-                MARKETWATCH.YEARS_ESTIMATE,
-                MARKETWATCH.MEDIAN_PE_ON_CY,
-                MARKETWATCH.NEXT_FISCAL_YEAR,
-                MARKETWATCH.MEDIAN_PE_NEXT_FY,
-                MARKETWATCH.LAST_QUARTER_EARNINGS,
-                MARKETWATCH.YEAR_AGO_EARNINGS,
-                MARKETWATCH.RECOMMENDATION,
-                MARKETWATCH.NUMBER_OF_RATINGS,
-                MARKETWATCH.BUY,
-                MARKETWATCH.OVERWEIGHT,
-                MARKETWATCH.HOLD,
-                MARKETWATCH.UNDERWEIGHT,
-                MARKETWATCH.SELL,
-                MARKETWATCH.TARGET_PRICE,
-                MARKETWATCH.LAST_UPDATED)
-                .values(marketWatchData.getSymbol(), marketWatchData.getQuartersEstimate(), marketWatchData.getYearsEstimate(),
-                        marketWatchData.getMedianPeOnCy(), marketWatchData.getNextFiscalYear(), marketWatchData.getMedianPeNextFy(),
-                        marketWatchData.getLastQuarterEarnings(), marketWatchData.getYearAgoEarnings(), marketWatchData.getRecommendation(),
-                        marketWatchData.getNumberOfRatings(), marketWatchData.getBuy(), marketWatchData.getOverweight(),
-                        marketWatchData.getHold(), marketWatchData.getUnderweight(), marketWatchData.getSell(),
-                        marketWatchData.getTargetPrice(), DateConverter.from(marketWatchData.getLastUpdated()))
-                .execute();
-    }
+//    Map<String, MarketWatchData> readFromDB(ConnAndDSL dsl, List<String> symbols) {
+//        Result<Record> marketRecords = dsl.getDsl().select().from(MARKETWATCH).where(MARKETWATCH.SYMBOL.in(symbols)).fetch();
+//        final Map<String, MarketWatchData> marketWatchDataMap = marketRecords.stream()
+//                .map(m -> recordToMarketWatchData(m))
+//                .collect(Collectors.toMap(m -> m.getSymbol(), m -> m));
+//        return marketWatchDataMap;
+//    }
+//
+//    Map<String, MarketWatchData> readFromDB(ConnAndDSL dsl) {
+//        Result<Record> marketRecords = dsl.getDsl().select().from(MARKETWATCH).fetch();
+//        final Map<String, MarketWatchData> marketWatchDataMap = marketRecords.stream()
+//                .map(m -> recordToMarketWatchData(m))
+//                .collect(Collectors.toMap(m -> m.getSymbol(), m -> m));
+//        return marketWatchDataMap;
+//    }
 
     MarketWatchData parseHtmlPage(String symbol, String body, String url) throws ParsingException {
         try {
