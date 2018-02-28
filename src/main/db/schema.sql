@@ -46,3 +46,15 @@ CREATE TABLE price_5m
   last_error TEXT,
   last_updated_error TIMESTAMP
 );
+
+CREATE TABLE market_fin_viz
+(
+  symbol VARCHAR(10) NOT NULL,
+  parameters BYTEA,
+  analysts BYTEA,
+  insiders BYTEA,
+  last_updated_success TIMESTAMP,
+  last_updated_error TIMESTAMP,
+  last_error TEXT,
+  last_warning TEXT
+);

@@ -1,7 +1,6 @@
 package org.superbiz.dao;
 
 import org.jooq.Record;
-import org.superbiz.db.ConnAndDSL;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
 import org.superbiz.dto.PriceDTO;
@@ -10,7 +9,6 @@ import org.superbiz.util.TickDataConverter;
 
 import javax.inject.Inject;
 
-import static org.superbiz.model.jooq.Tables.MARKETWATCH;
 import static org.superbiz.model.jooq.Tables.PRICE_5M;
 
 public class Price5mDAO {
@@ -88,7 +86,7 @@ public class Price5mDAO {
                         .set(PRICE_5M.DATA, TickDataConverter.tickDataAsJson(price.getData()))
                         .set(PRICE_5M.LAST_ERROR, price.getLastError())
                         .set(PRICE_5M.LAST_UPDATED_ERROR, DateConverter.fromLocalDateTime(price.getLastUpdatedError()))
-                        .where(MARKETWATCH.SYMBOL.eq(price.getSymbol()))
+                        .where(PRICE_5M.SYMBOL.eq(price.getSymbol()))
                         .execute();
             }
         }
@@ -115,7 +113,7 @@ public class Price5mDAO {
                 dsl.getDsl().update(PRICE_5M)
                         .set(PRICE_5M.LAST_ERROR, price.getLastError())
                         .set(PRICE_5M.LAST_UPDATED_ERROR, DateConverter.fromLocalDateTime(price.getLastUpdatedError()))
-                        .where(MARKETWATCH.SYMBOL.eq(price.getSymbol()))
+                        .where(PRICE_5M.SYMBOL.eq(price.getSymbol()))
                         .execute();
             }
         }

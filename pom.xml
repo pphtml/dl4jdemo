@@ -124,6 +124,13 @@
         </dependency>
 
         <dependency>
+            <groupId>net.lamberto.junit</groupId>
+            <artifactId>guice-junit-runner</artifactId>
+            <version>1.0.2</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>${HikariCP.version}</version>

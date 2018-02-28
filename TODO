@@ -1,6 +1,6 @@
 - vicevlaknovost pro marketwatch
+- gzip pro ukladana data
 - DateConverter - https://stackoverflow.com/questions/8992282/convert-localdate-to-localdatetime-or-java-sql-timestamp
-- TickData do testu - resource
 - merge Price
   - porovnani uz ulozenych dat
 - yahoo events
@@ -17,12 +17,14 @@
   - REST pro cteni marketwatch
   - poresit DB
 - referencni integrita
-- paralelni cteni - omezit na pocet vlaken
-- initial data dump
-- initial data load script
-- automaticka kopie dat
-- jsonwrite - poradi - lastupdate na prvni misto
-- vypusteni quoted atributu?, gzip pro ukladana data?
+- initial data dump - securities
+- automaticka kopie dat pred ctenim novych dat
+
+- https://www.fool.com/how-to-invest/2012/09/10/10-indispensable-websites-for-investors.aspx
+- https://finviz.com/quote.ashx?t=AMZN
+
+- https://github.com/HubSpot/dropwizard-guice
+- Dropwizard Web - http://blog.scottlogic.com/2016/01/05/java-microservices-with-dropwizard-tutorial.html
 
 
 - xor priklad - XorExample

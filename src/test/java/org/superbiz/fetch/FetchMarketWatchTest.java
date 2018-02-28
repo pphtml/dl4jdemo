@@ -1,10 +1,14 @@
 package org.superbiz.fetch;
 
+import net.lamberto.junit.GuiceJUnitRunner;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.superbiz.db.ConnAndDSL;
 import org.superbiz.fetch.model.MarketWatchData;
+import org.superbiz.guice.BasicModule;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -17,8 +21,11 @@ import static org.junit.Assert.*;
 import static org.superbiz.fetch.model.MarketWatchData.MarketWatchDataBuilder.aMarketWatchData;
 import static org.superbiz.util.Utils.readResourceToString;
 
+@RunWith(GuiceJUnitRunner.class)
+@GuiceJUnitRunner.GuiceModules(BasicModule.class)
 public class FetchMarketWatchTest {
-    FetchMarketWatch fetchMarketWatch = new FetchMarketWatch();
+    @Inject
+    FetchMarketWatch fetchMarketWatch;
 
     @Test
     public void parseHtmlPage() throws ParsingException {
