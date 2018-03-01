@@ -1,11 +1,17 @@
 package org.superbiz.dao;
 
 import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
 import org.superbiz.dto.MarketFinVizDTO;
 
 import javax.inject.Inject;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.superbiz.model.jooq.Tables.MARKET_FIN_VIZ;
 import static org.superbiz.util.DateConverter.fromLocalDateTime;
@@ -29,9 +35,9 @@ public class MarketFinVizDAO {
                         MARKET_FIN_VIZ.LAST_ERROR,
                         MARKET_FIN_VIZ.LAST_WARNING)
                         .values(finViz.getSymbol(),
-                                finViz.getParameters().getBytes(),
-                                finViz.getAnalysts().getBytes(),
-                                finViz.getInsiders().getBytes(),
+                                finViz.getParameters(),
+                                finViz.getAnalysts(),
+                                finViz.getInsiders(),
                                 fromLocalDateTime(finViz.getLastUpdatedSuccess()),
                                 fromLocalDateTime(finViz.getLastUpdatedError()),
                                 finViz.getLastError(),
@@ -40,9 +46,9 @@ public class MarketFinVizDAO {
 
             } else {
                 dsl.getDsl().update(MARKET_FIN_VIZ)
-                        .set(MARKET_FIN_VIZ.PARAMETERS, finViz.getParameters().getBytes())
-                        .set(MARKET_FIN_VIZ.ANALYSTS, finViz.getAnalysts().getBytes())
-                        .set(MARKET_FIN_VIZ.INSIDERS, finViz.getInsiders().getBytes())
+                        .set(MARKET_FIN_VIZ.PARAMETERS, finViz.getParameters())
+                        .set(MARKET_FIN_VIZ.ANALYSTS, finViz.getAnalysts())
+                        .set(MARKET_FIN_VIZ.INSIDERS, finViz.getInsiders())
                         .set(MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS, fromLocalDateTime(finViz.getLastUpdatedSuccess()))
                         .set(MARKET_FIN_VIZ.LAST_UPDATED_ERROR, fromLocalDateTime(finViz.getLastUpdatedError()))
                         .set(MARKET_FIN_VIZ.LAST_ERROR, finViz.getLastError())
@@ -94,9 +100,9 @@ public class MarketFinVizDAO {
         if (record != null) {
             return MarketFinVizDTO.MarketFinVizDTOBuilder.createMarketFinVizDTO()
                     .withSymbol(record.get(MARKET_FIN_VIZ.SYMBOL))
-                    .withParameters(MarketFinVizDTO.Parameters.from(record.get(MARKET_FIN_VIZ.PARAMETERS)))
-                    .withAnalysts(MarketFinVizDTO.Analysts.from(record.get(MARKET_FIN_VIZ.ANALYSTS)))
-                    .withInsiders(MarketFinVizDTO.Insiders.from(record.get(MARKET_FIN_VIZ.INSIDERS)))
+                    .withParameters(record.get(MARKET_FIN_VIZ.PARAMETERS))
+                    .withAnalysts(record.get(MARKET_FIN_VIZ.ANALYSTS))
+                    .withInsiders(record.get(MARKET_FIN_VIZ.INSIDERS))
                     .withLastUpdatedSuccess(toLocalDateTime(record.get(MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS)))
                     .withLastUpdatedError(toLocalDateTime(record.get(MARKET_FIN_VIZ.LAST_UPDATED_ERROR)))
                     .withLastError(record.get(MARKET_FIN_VIZ.LAST_ERROR))
@@ -104,6 +110,17 @@ public class MarketFinVizDAO {
                     .build();
         } else {
             return null;
+        }
+    }
+
+    public List<String> findFreshDataSymbols(LocalDateTime dateTime) {
+        try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
+            Result<Record1<String>> symbols = dsl.getDsl()
+                    .select(MARKET_FIN_VIZ.SYMBOL)
+                    .from(MARKET_FIN_VIZ)
+                    .where(MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS.gt(fromLocalDateTime(dateTime)))
+                    .fetch();
+            return symbols.stream().map(r -> r.value1()).collect(Collectors.toList());
         }
     }
 }

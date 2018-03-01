@@ -10,35 +10,33 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.nd4j.shade.jackson.core.JsonProcessingException;
+import org.nd4j.shade.jackson.databind.ObjectMapper;
 import org.superbiz.dao.MarketFinVizDAO;
-import org.superbiz.dao.Price5mDAO;
 import org.superbiz.dao.SecurityDAO;
 import org.superbiz.dto.MarketFinVizDTO;
-import org.superbiz.dto.PriceDTO;
-import org.superbiz.fetch.model.MarketWatchData;
-import org.superbiz.fetch.model.ParsingResult;
+import org.superbiz.fetch.model.finviz.AnalystEstimate;
+import org.superbiz.fetch.model.finviz.InsiderTrade;
 import org.superbiz.guice.BasicModule;
 import org.superbiz.util.GlobalInit;
+import org.superbiz.util.GzipUtil;
+import org.superbiz.util.InsiderTradeParser;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.superbiz.dto.MarketFinVizDTO.MarketFinVizDTOBuilder.createMarketFinVizDTO;
-import static org.superbiz.dto.PriceDTO.PriceDTOBuilder.createPriceDTO;
-import static org.superbiz.fetch.model.MarketWatchData.MarketWatchDataBuilder.aMarketWatchData;
-import static org.superbiz.model.jooq.Tables.MARKET_FIN_VIZ;
 import static org.superbiz.model.jooq.Tables.SECURITY;
-import static org.superbiz.util.DateConverter.toLocalDateTime;
 
 public class FetchFinViz {
     static { GlobalInit.init(); }
@@ -55,6 +53,11 @@ public class FetchFinViz {
     @Inject
     MarketFinVizDAO marketFinVizDAO;
 
+    @Inject
+    InsiderTradeParser insiderTradeParser;
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchFinViz fetchData = injector.getInstance(FetchFinViz.class);
@@ -64,10 +67,13 @@ public class FetchFinViz {
     private void fetchAll() throws IOException {
         LOGGER.info("Starting");
         try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
-            Result<Record> securities = securityDAO.fetchAll();
+
+            List<String> knownSecurities = marketFinVizDAO.findFreshDataSymbols(LocalDate.now().atStartOfDay());
+            Result<Record> securities = securityDAO.findAllSecuritiesExcept(knownSecurities);
+
             securities.stream().forEach(security -> {
                 final String symbol = security.get(SECURITY.SYMBOL);
-                final String url = createUrl(symbol);
+                final String url = createUrl(localSymbol(symbol));
                 final Request getRequest = new RequestBuilder(HttpConstants.Methods.GET)
                         .setUrl(url)
                         .build();
@@ -76,12 +82,15 @@ public class FetchFinViz {
                 try {
                     Response response = responseFuture.get();
                     LOGGER.info(String.format("%s -> %s (%s)", symbol, response.getStatusCode(), url));
-                    FinVizWebResultVO finVizWebResult = processData(symbol, response.getResponseBody(), url);
+                    FinVizVO finVizWebResult = processData(symbol, response.getResponseBody(), url);
+
+                    // TODO MERGE ME!
+
                     MarketFinVizDTO marketFinVizDTO = createMarketFinVizDTO()
                             .withSymbol(symbol)
-                            .withParameters(finVizWebResult.getParameters())
-                            .withAnalysts(finVizWebResult.getAnalysts())
-                            .withInsiders(finVizWebResult.getInsiders())
+                            .withParameters(finVizWebResult.getParametersAsBytes())
+                            .withAnalysts(finVizWebResult.getAnalystsAsBytes())
+                            .withInsiders(finVizWebResult.getInsidersAsBytes())
                             .withLastUpdatedSuccess(LocalDateTime.now())
                             .build();
                     marketFinVizDAO.insertOrUpdate(marketFinVizDTO);
@@ -101,7 +110,11 @@ public class FetchFinViz {
         LOGGER.info("Finished");
     }
 
-    FinVizWebResultVO processData(String symbol, String body, String url) throws ParsingException {
+    private String localSymbol(String symbol) {
+        return symbol.replaceAll("\\.", "-");
+    }
+
+    FinVizVO processData(String symbol, String body, String url) throws ParsingException {
         try {
             Document doc = Jsoup.parse(body);
             Element estimates = doc.select("table.snapshot-table2").first();
@@ -111,70 +124,63 @@ public class FetchFinViz {
             }
             Elements rows = estimates.select("tr");
             Map<String, String> parameters = rows.stream()
-            //List<ParameterRecord> parameters = rows.stream()
                     .map(row -> {
                         Elements columns = row.select("td");
                         return IntStream.range(0, columns.size() / 2)
                                 .mapToObj(index -> {
                                     ParameterRecord parameterRecord = ParameterRecord.of(columns.get(index * 2).text(), columns.get(index * 2 + 1).text());
-                                    LOGGER.info(String.format("%s", parameterRecord));
+                                    //LOGGER.info(String.format("%s", parameterRecord));
                                     return parameterRecord;
                                 });
 //                        return Stream.of(ParameterRecord.of(columns.get(0).text(), columns.get(1).text()),
 //                                ParameterRecord.of(columns.get(2).text(), columns.get(3).text()));
                     })
                     .flatMap(stream -> stream)
-                    //.filter(snapshot -> snapshot.getLabel().length() > 0)
-                    //.forEach(s -> System.out.println(String.format("%s=%s", s.getDescription(), s.getValue())));
-                    //.collect(Collectors.toList());
-                    .collect(Collectors.toMap(ParameterRecord::getLabel,
-                            c -> c.getValue(),
-                            (key1, key2) -> {
-                                LOGGER.warning(String.format("Duplicate key found: %s", key1));
-                                return key1;
-                            }));
+                    .map(record -> record.label.contains("EPS next Y") && record.value.contains("%")
+                            ? ParameterRecord.of("EPSP next Y", record.value) : record)
+                    .filter(record -> !record.value.matches("-"))
+                    .filter(record -> !record.label.matches("ATR|Index|SMA.*|RSI.*|52W.*|.*Volume|Prev Close|Price|Change"))
+//                    .collect(Collectors.toMap(c -> {
+//                        LOGGER.info(c.getLabel());
+//                        return c.getLabel();
+//                            },
+//                            c -> c.getValue()));
+                    .collect(Collectors.toMap(c -> c.getLabel(),
+                            c -> c.getValue()));
 
-            System.out.println("tady");
-//            Element ratings = doc.select("table.ratings").first();
-//            final Map<String, String> ratingsMap = ratings.select("tr").stream()
-//                    .map(row -> {
-//                        final Stream<FetchMarketWatch.RecommendationRecord> result;
-//                        Elements columns = row.select("td");
-//                        if (columns.size() > 0) {
-//                            final String key = columns.get(0).text();
-//                            if (!"MEAN".equals(key)) {
-//                                result = Stream.of(FetchMarketWatch.RecommendationRecord.of(key, columns.get(1).text()));
-//                            } else {
-//                                result = Stream.empty();
-//                            }
-//                        } else {
-//                            result = Stream.empty();
-//                        }
-//                        return result;
-//                    })
-//                    .flatMap(Function.identity())
-//                    .collect(Collectors.toMap(FetchMarketWatch.RecommendationRecord::getKey, r -> r.getValue()));
-//
-//            MarketWatchData marketWatchData = aMarketWatchData()
-//                    .withSymbol(symbol)
-//                    .withRecommendation(snapshots.get("Average Recommendation"))
-//                    .withTargetPrice(sanitizePrice(snapshots.get("Average Target Price")))
-//                    .withNumberOfRatings(sanitizeInteger(snapshots.get("Number of Ratings")))
-//                    .withQuartersEstimate(sanitizePrice(snapshots.get("Current Quarters Estimate")))
-//                    .withYearsEstimate(sanitizePrice(snapshots.get("Current Year's Estimate")))
-//                    .withLastQuarterEarnings(sanitizePrice(snapshots.get("Last Quarter's Earnings")))
-//                    .withMedianPeOnCy(sanitizePrice(snapshots.get("Median PE on CY Estimate")))
-//                    .withYearAgoEarnings(sanitizePrice(snapshots.get("Year Ago Earnings")))
-//                    .withNextFiscalYear(sanitizePrice(snapshots.get("Next Fiscal Year Estimate")))
-//                    .withMedianPeNextFy(sanitizePrice(snapshots.get("Median PE on Next FY Estimate")))
-//                    .withBuy(sanitizeInteger(ratingsMap.get("BUY")))
-//                    .withOverweight(sanitizeInteger(ratingsMap.get("OVERWEIGHT")))
-//                    .withHold(sanitizeInteger(ratingsMap.get("HOLD")))
-//                    .withUnderweight(sanitizeInteger(ratingsMap.get("UNDERWEIGHT")))
-//                    .withSell(sanitizeInteger(ratingsMap.get("SELL")))
-//                    .build();
-//            return marketWatchData;
-            return null;
+//            String list = parameters.keySet().stream()
+//                    .sorted()
+//                    .collect(Collectors.joining("\n"));
+//            LOGGER.info(String.format("%d\n%s", parameters.size(), list));
+
+
+
+            Element ratingsOuter = doc.select("table.fullview-ratings-outer").first();
+            final List<AnalystEstimate> analystEstimates = ratingsOuter == null ? Collections.emptyList() :
+                    ratingsOuter.select("table table tr").stream()
+                    .map(rec -> {
+                        List<String> tds = rec.select("td").stream()
+                                .map(e -> e.text())
+                                .collect(Collectors.toList());
+                        return AnalystEstimate.of(tds.get(0), tds.get(1), tds.get(2), tds.get(3), tds.get(4));
+                    })
+                    .collect(Collectors.toList());
+
+
+
+            Element insiderTrading = doc.select("table.body-table").first();
+            List<InsiderTrade> insiderTradings = insiderTrading == null ? Collections.emptyList() :
+                    insiderTrading.select("tr.insider-option-row").stream()
+                    .map(rec -> {
+                        List<String> tds = rec.select("td").stream()
+                                .map(e -> e.text())
+                                .collect(Collectors.toList());
+                        return insiderTradeParser.parse(tds.get(1), tds.get(2), tds.get(3), tds.get(4),
+                                tds.get(5), tds.get(6), tds.get(7), tds.get(8));
+                    })
+                    .collect(Collectors.toList());
+
+            return FinVizVO.of(parameters, analystEstimates, insiderTradings);
         } catch (ParsingException e) {
             throw e;
         } catch (Exception e) {
@@ -183,42 +189,65 @@ public class FetchFinViz {
         }
     }
 
-    public static class FinVizWebResultVO {
-        private MarketFinVizDTO.Parameters parameters;
-        private MarketFinVizDTO.Analysts analysts;
-        private MarketFinVizDTO.Insiders insiders;
-        private List<String> warningMessages;
+    public static class FinVizVO {
+        private final Map<String, String> parameters;
+        private final List<AnalystEstimate> analysts;
+        private final List<InsiderTrade> insiders;
 
-        public MarketFinVizDTO.Parameters getParameters() {
-            return parameters;
-        }
-
-        public void setParameters(MarketFinVizDTO.Parameters parameters) {
+        public FinVizVO(Map<String, String> parameters, List<AnalystEstimate> analysts, List<InsiderTrade> insiders) {
             this.parameters = parameters;
-        }
-
-        public MarketFinVizDTO.Analysts getAnalysts() {
-            return analysts;
-        }
-
-        public void setAnalysts(MarketFinVizDTO.Analysts analysts) {
             this.analysts = analysts;
-        }
-
-        public MarketFinVizDTO.Insiders getInsiders() {
-            return insiders;
-        }
-
-        public void setInsiders(MarketFinVizDTO.Insiders insiders) {
             this.insiders = insiders;
         }
 
-        public List<String> getWarningMessages() {
-            return warningMessages;
+        public Map<String, String> getParameters() {
+            return parameters;
         }
 
-        public void setWarningMessages(List<String> warningMessages) {
-            this.warningMessages = warningMessages;
+        public List<AnalystEstimate> getAnalysts() {
+            return analysts;
+        }
+
+        public List<InsiderTrade> getInsiders() {
+            return insiders;
+        }
+
+        //        private MarketFinVizDTO.Parameters parameters;
+//        private MarketFinVizDTO.Analysts analysts;
+//        private MarketFinVizDTO.Insiders insiders;
+//        private List<String> warningMessages;
+
+
+        public static FinVizVO of(Map<String, String> parameters, List<AnalystEstimate> analystEstimates, List<InsiderTrade> insiderTradings) {
+            FinVizVO result = new FinVizVO(parameters, analystEstimates, insiderTradings);
+            return result;
+        }
+
+        public byte[] getParametersAsBytes() {
+            try {
+                String json = OBJECT_MAPPER.writeValueAsString(parameters);
+                return GzipUtil.zip(json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public byte[] getAnalystsAsBytes() {
+            try {
+                String json = OBJECT_MAPPER.writeValueAsString(analysts);
+                return GzipUtil.zip(json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public byte[] getInsidersAsBytes() {
+            try {
+                String json = OBJECT_MAPPER.writeValueAsString(insiders);
+                return GzipUtil.zip(json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

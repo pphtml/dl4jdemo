@@ -3,13 +3,13 @@ package org.superbiz.fetch;
 import net.lamberto.junit.GuiceJUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.superbiz.fetch.model.MarketWatchData;
+import org.superbiz.fetch.model.finviz.AnalystEstimate;
 import org.superbiz.guice.BasicModule;
 import org.superbiz.util.GlobalInit;
 
 import javax.inject.Inject;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.superbiz.util.Utils.readResourceToString;
@@ -25,8 +25,11 @@ public class FetchFinVizTest {
     @Test
     public void processData() throws ParsingException {
         String body = readResourceToString(getClass(), "A_finViz.html");
-        FetchFinViz.FinVizWebResultVO finVizWebResult = fetchFinViz.processData("AMZN", body, null);
+        FetchFinViz.FinVizVO finVizWebResult = fetchFinViz.processData("AMZN", body, null);
         assertNotNull(finVizWebResult);
+
+        List<AnalystEstimate> analysts = finVizWebResult.getAnalysts();
+        System.out.println(analysts);
 
 //        assertEquals("AMZN", marketWatchData.getSymbol());
 //        assertEquals("Buy", marketWatchData.getRecommendation());

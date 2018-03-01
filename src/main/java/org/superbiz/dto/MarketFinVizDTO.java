@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 public class MarketFinVizDTO {
     private String symbol;
-    private Parameters parameters;
-    private Analysts analysts;
-    private Insiders insiders;
+    private byte[] parameters;
+    private byte[] analysts;
+    private byte[] insiders;
     private LocalDateTime lastUpdatedSuccess;
     private LocalDateTime lastUpdatedError;
     private String lastError;
@@ -20,27 +20,27 @@ public class MarketFinVizDTO {
         this.symbol = symbol;
     }
 
-    public Parameters getParameters() {
+    public byte[] getParameters() {
         return parameters;
     }
 
-    public void setParameters(Parameters parameters) {
+    public void setParameters(byte[] parameters) {
         this.parameters = parameters;
     }
 
-    public Analysts getAnalysts() {
+    public byte[] getAnalysts() {
         return analysts;
     }
 
-    public void setAnalysts(Analysts analysts) {
+    public void setAnalysts(byte[] analysts) {
         this.analysts = analysts;
     }
 
-    public Insiders getInsiders() {
+    public byte[] getInsiders() {
         return insiders;
     }
 
-    public void setInsiders(Insiders insiders) {
+    public void setInsiders(byte[] insiders) {
         this.insiders = insiders;
     }
 
@@ -79,9 +79,9 @@ public class MarketFinVizDTO {
 
     public static final class MarketFinVizDTOBuilder {
         private String symbol;
-        private Parameters parameters;
-        private Analysts analysts;
-        private Insiders insiders;
+        private byte[] parameters;
+        private byte[] analysts;
+        private byte[] insiders;
         private LocalDateTime lastUpdatedSuccess;
         private LocalDateTime lastUpdatedError;
         private String lastError;
@@ -99,17 +99,17 @@ public class MarketFinVizDTO {
             return this;
         }
 
-        public MarketFinVizDTOBuilder withParameters(Parameters parameters) {
+        public MarketFinVizDTOBuilder withParameters(byte[] parameters) {
             this.parameters = parameters;
             return this;
         }
 
-        public MarketFinVizDTOBuilder withAnalysts(Analysts analysts) {
+        public MarketFinVizDTOBuilder withAnalysts(byte[] analysts) {
             this.analysts = analysts;
             return this;
         }
 
-        public MarketFinVizDTOBuilder withInsiders(Insiders insiders) {
+        public MarketFinVizDTOBuilder withInsiders(byte[] insiders) {
             this.insiders = insiders;
             return this;
         }
@@ -148,36 +148,36 @@ public class MarketFinVizDTO {
         }
     }
 
-    public static class Parameters {
-        public byte[] getBytes() {
-            return null;
-        }
-
-        public static Parameters from(byte[] bytes) {
-            if (true) throw new UnsupportedOperationException("implement me!");
-            return new Parameters();
-        }
-    }
-
-    public static class Insiders {
-        public byte[] getBytes() {
-            return null;
-        }
-
-        public static Insiders from(byte[] bytes) {
-            if (true) throw new UnsupportedOperationException("implement me!");
-            return new Insiders();
-        }
-    }
-
-    public static class Analysts {
-        public byte[] getBytes() {
-            return null;
-        }
-
-        public static Analysts from(byte[] bytes) {
-            if (true) throw new UnsupportedOperationException("implement me!");
-            return new Analysts();
-        }
-    }
+//    public static class Parameters {
+//        public byte[] getBytes() {
+//            return null;
+//        }
+//
+//        public static Parameters from(byte[] bytes) {
+//            if (true) throw new UnsupportedOperationException("implement me!");
+//            return new Parameters();
+//        }
+//    }
+//
+//    public static class Insiders {
+//        public byte[] getBytes() {
+//            return null;
+//        }
+//
+//        public static Insiders from(byte[] bytes) {
+//            if (true) throw new UnsupportedOperationException("implement me!");
+//            return new Insiders();
+//        }
+//    }
+//
+//    public static class Analysts {
+//        public byte[] getBytes() {
+//            return null;
+//        }
+//
+//        public static Analysts from(byte[] bytes) {
+//            if (true) throw new UnsupportedOperationException("implement me!");
+//            return new Analysts();
+//        }
+//    }
 }

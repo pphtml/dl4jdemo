@@ -33,6 +33,7 @@
 - MLP classifier linear / moon / saturn - MLPClassifierLinear
 - rnn - basic example - BasicRNNExample
 - rnn - UCISequenceClassificationExample
+- https://dzone.com/articles/java-art-generation-with-neural-style-transfer
 - https://github.com/josej30/Neural-Network
 - https://github.com/bentorfs/AI-algorithms
 - https://github.com/Jasonnor/Backpropagation/blob/master/src/Backpropagation/Algorithm/NeuralNetwork.java
