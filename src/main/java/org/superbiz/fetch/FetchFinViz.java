@@ -16,6 +16,7 @@ import org.superbiz.dao.MarketFinVizDAO;
 import org.superbiz.dao.SecurityDAO;
 import org.superbiz.dto.MarketFinVizDTO;
 import org.superbiz.fetch.model.finviz.AnalystEstimate;
+import org.superbiz.fetch.model.finviz.DayParameters;
 import org.superbiz.fetch.model.finviz.InsiderTrade;
 import org.superbiz.guice.BasicModule;
 import org.superbiz.util.GlobalInit;
@@ -26,9 +27,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,7 +84,9 @@ public class FetchFinViz {
                     LOGGER.info(String.format("%s -> %s (%s)", symbol, response.getStatusCode(), url));
                     FinVizVO finVizWebResult = processData(symbol, response.getResponseBody(), url);
 
-                    // TODO MERGE ME!
+                    Optional<MarketFinVizDTO> oldFinVizDTO = marketFinVizDAO.findBySymbol(symbol);
+
+                    FinVizVO finVizMerged = finVizWebResult.mergeWithOldData(oldFinVizDTO);
 
                     MarketFinVizDTO marketFinVizDTO = createMarketFinVizDTO()
                             .withSymbol(symbol)
@@ -115,6 +117,8 @@ public class FetchFinViz {
     }
 
     FinVizVO processData(String symbol, String body, String url) throws ParsingException {
+        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+
         try {
             Document doc = Jsoup.parse(body);
             Element estimates = doc.select("table.snapshot-table2").first();
@@ -138,7 +142,7 @@ public class FetchFinViz {
                     .flatMap(stream -> stream)
                     .map(record -> record.label.contains("EPS next Y") && record.value.contains("%")
                             ? ParameterRecord.of("EPSP next Y", record.value) : record)
-                    .filter(record -> !record.value.matches("-"))
+                    //.filter(record -> !record.value.matches("-"))
                     .filter(record -> !record.label.matches("ATR|Index|SMA.*|RSI.*|52W.*|.*Volume|Prev Close|Price|Change"))
 //                    .collect(Collectors.toMap(c -> {
 //                        LOGGER.info(c.getLabel());
@@ -180,7 +184,7 @@ public class FetchFinViz {
                     })
                     .collect(Collectors.toList());
 
-            return FinVizVO.of(parameters, analystEstimates, insiderTradings);
+            return FinVizVO.ofSingleParameters(currentDate, parameters, analystEstimates, insiderTradings);
         } catch (ParsingException e) {
             throw e;
         } catch (Exception e) {
@@ -190,17 +194,23 @@ public class FetchFinViz {
     }
 
     public static class FinVizVO {
-        private final Map<String, String> parameters;
+        private final Map<LocalDate, DayParameters> parameters;
         private final List<AnalystEstimate> analysts;
         private final List<InsiderTrade> insiders;
 
-        public FinVizVO(Map<String, String> parameters, List<AnalystEstimate> analysts, List<InsiderTrade> insiders) {
+        public FinVizVO(Map<LocalDate, DayParameters> parameters, List<AnalystEstimate> analysts, List<InsiderTrade> insiders) {
             this.parameters = parameters;
             this.analysts = analysts;
             this.insiders = insiders;
         }
 
-        public Map<String, String> getParameters() {
+//        public FinVizVO(Map<String, String> parameters, List<AnalystEstimate> analysts, List<InsiderTrade> insiders) {
+//            this.parameters = parameters;
+//            this.analysts = analysts;
+//            this.insiders = insiders;
+//        }
+//
+        public Map<LocalDate, DayParameters> getParameters() {
             return parameters;
         }
 
@@ -218,9 +228,15 @@ public class FetchFinViz {
 //        private List<String> warningMessages;
 
 
-        public static FinVizVO of(Map<String, String> parameters, List<AnalystEstimate> analystEstimates, List<InsiderTrade> insiderTradings) {
+        public static FinVizVO of(Map<LocalDate, DayParameters> parameters, List<AnalystEstimate> analystEstimates, List<InsiderTrade> insiderTradings) {
             FinVizVO result = new FinVizVO(parameters, analystEstimates, insiderTradings);
             return result;
+        }
+
+        public static FinVizVO ofSingleParameters(LocalDate date, Map<String, String> singleParameters, List<AnalystEstimate> analystEstimates, List<InsiderTrade> insiderTradings) {
+            Map<LocalDate, DayParameters> parameters = new HashMap<>(1);
+            parameters.put(date, DayParameters.of(date, singleParameters));
+            return of(parameters, analystEstimates, insiderTradings);
         }
 
         public byte[] getParametersAsBytes() {
@@ -248,6 +264,10 @@ public class FetchFinViz {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public FinVizVO mergeWithOldData(Optional<MarketFinVizDTO> oldFinVizDTO) {
+            return null;
         }
     }
 

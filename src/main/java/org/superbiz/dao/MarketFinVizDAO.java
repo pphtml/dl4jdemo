@@ -6,11 +6,13 @@ import org.jooq.Result;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
 import org.superbiz.dto.MarketFinVizDTO;
+import org.superbiz.fetch.FetchFinViz;
 
 import javax.inject.Inject;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.superbiz.model.jooq.Tables.MARKET_FIN_VIZ;
@@ -85,19 +87,8 @@ public class MarketFinVizDAO {
         }
     }
 
-    public MarketFinVizDTO read(String symbol) {
-        try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
-            Record record = dsl.getDsl()
-                    .select()
-                    .from(MARKET_FIN_VIZ)
-                    .where(MARKET_FIN_VIZ.SYMBOL.eq(symbol))
-                    .fetchOne();
-            return convertRecordToMarketFinVizDTO(record);
-        }
-    }
-
     private MarketFinVizDTO convertRecordToMarketFinVizDTO(Record record) {
-        if (record != null) {
+//        if (record != null) {
             return MarketFinVizDTO.MarketFinVizDTOBuilder.createMarketFinVizDTO()
                     .withSymbol(record.get(MARKET_FIN_VIZ.SYMBOL))
                     .withParameters(record.get(MARKET_FIN_VIZ.PARAMETERS))
@@ -108,9 +99,9 @@ public class MarketFinVizDAO {
                     .withLastError(record.get(MARKET_FIN_VIZ.LAST_ERROR))
                     .withLastWarning(record.get(MARKET_FIN_VIZ.LAST_WARNING))
                     .build();
-        } else {
-            return null;
-        }
+//        } else {
+//            return null;
+//        }
     }
 
     public List<String> findFreshDataSymbols(LocalDateTime dateTime) {
@@ -121,6 +112,19 @@ public class MarketFinVizDAO {
                     .where(MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS.gt(fromLocalDateTime(dateTime)))
                     .fetch();
             return symbols.stream().map(r -> r.value1()).collect(Collectors.toList());
+        }
+    }
+
+    public Optional<MarketFinVizDTO> findBySymbol(String symbol) {
+        try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
+            Record record = dsl.getDsl()
+                    .select()
+                    .from(MARKET_FIN_VIZ)
+                    .where(MARKET_FIN_VIZ.SYMBOL.eq(symbol))
+                    .fetchOne();
+            return record != null ?
+                    Optional.of(convertRecordToMarketFinVizDTO(record)) :
+                    Optional.empty();
         }
     }
 }
