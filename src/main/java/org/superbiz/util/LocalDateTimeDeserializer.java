@@ -7,19 +7,20 @@ import org.nd4j.shade.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class LocalDateDeserializer extends StdDeserializer<LocalDate> {
+public class LocalDateTimeDeserializer extends StdDeserializer<LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
-    public LocalDateDeserializer() {
-        super(LocalDate.class);
+    protected LocalDateTimeDeserializer() {
+        super(LocalDateTime.class);
     }
 
 
     @Override
-    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt)
+    public LocalDateTime deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        return LocalDate.parse(jp.readValueAs(String.class));
+        return LocalDateTime.parse(jp.readValueAs(String.class));
     }
 }

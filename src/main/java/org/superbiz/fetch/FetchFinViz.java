@@ -11,17 +11,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.nd4j.shade.jackson.core.JsonProcessingException;
+import org.nd4j.shade.jackson.core.type.TypeReference;
 import org.nd4j.shade.jackson.databind.ObjectMapper;
+import org.nd4j.shade.jackson.databind.SerializationFeature;
+import org.nd4j.shade.jackson.databind.module.SimpleModule;
+//import org.nd4j.shade.jackson.datatype.joda.deser.key.LocalDateKeyDeserializer;
 import org.superbiz.dao.MarketFinVizDAO;
 import org.superbiz.dao.SecurityDAO;
 import org.superbiz.dto.MarketFinVizDTO;
+import org.superbiz.fetch.model.MarketWatchData;
 import org.superbiz.fetch.model.finviz.AnalystEstimate;
 import org.superbiz.fetch.model.finviz.DayParameters;
 import org.superbiz.fetch.model.finviz.InsiderTrade;
 import org.superbiz.guice.BasicModule;
-import org.superbiz.util.GlobalInit;
-import org.superbiz.util.GzipUtil;
-import org.superbiz.util.InsiderTradeParser;
+import org.superbiz.util.*;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.superbiz.dto.MarketFinVizDTO.MarketFinVizDTOBuilder.createMarketFinVizDTO;
 import static org.superbiz.model.jooq.Tables.SECURITY;
@@ -58,10 +62,27 @@ public class FetchFinViz {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    static {
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addKeyDeserializer(LocalDate.class, new LocalDateDeserializer());
+        OBJECT_MAPPER.registerModule(simpleModule);
+
+        //OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchFinViz fetchData = injector.getInstance(FetchFinViz.class);
-        fetchData.fetchAll();
+        //fetchData.fetchAll();
+        fetchData.findBySymbol("AMZN");
+    }
+
+    private void findBySymbol(String symbol) {
+        Optional<MarketFinVizDTO> oldFinVizDTO = marketFinVizDAO.findBySymbol(symbol);
+        if (oldFinVizDTO.isPresent()) {
+            FinVizVO finViz = FinVizVO.of(oldFinVizDTO.get().getParameters(), oldFinVizDTO.get().getAnalysts(), oldFinVizDTO.get().getInsiders());
+            System.out.println(finViz);
+        }
     }
 
     private void fetchAll() throws IOException {
@@ -86,7 +107,7 @@ public class FetchFinViz {
 
                     Optional<MarketFinVizDTO> oldFinVizDTO = marketFinVizDAO.findBySymbol(symbol);
 
-                    FinVizVO finVizMerged = finVizWebResult.mergeWithOldData(oldFinVizDTO);
+                    FinVizVO finVizMerged = mergeFinVizData(oldFinVizDTO, finVizWebResult);
 
                     MarketFinVizDTO marketFinVizDTO = createMarketFinVizDTO()
                             .withSymbol(symbol)
@@ -112,6 +133,45 @@ public class FetchFinViz {
         LOGGER.info("Finished");
     }
 
+    FinVizVO mergeFinVizData(Optional<MarketFinVizDTO> oldFinVizDTO, FinVizVO newFinVizVO) {
+        if (oldFinVizDTO.isPresent()) {
+            final FinVizVO oldFinVizVO = FinVizVO.of(oldFinVizDTO.get().getParameters(),
+                    oldFinVizDTO.get().getAnalysts(),
+                    oldFinVizDTO.get().getInsiders());
+            Map<LocalDate, DayParameters> oldParameters = oldFinVizVO.getParameters();
+            if (newFinVizVO.getParameters().size() != 1) {
+                throw new IllegalArgumentException(String.format("Size of new parameters is supposed to be of size 1, not %d",
+                        newFinVizVO.getParameters().size()));
+            }
+            Map<LocalDate, DayParameters> parametersMerged = mergeParameters(oldParameters, newFinVizVO.getParameters());
+            List<AnalystEstimate> analystMerged = ListMerger.mergeLists(oldFinVizVO.getAnalysts(), newFinVizVO.getAnalysts());
+            List<InsiderTrade> insiderMerged = ListMerger.mergeLists(oldFinVizVO.getInsiders(), newFinVizVO.getInsiders());
+            return FinVizVO.of(parametersMerged, analystMerged, insiderMerged);
+        } else {
+            return newFinVizVO;
+        }
+    }
+
+    Map<LocalDate,DayParameters> mergeParameters(Map<LocalDate, DayParameters> oldParameters, Map<LocalDate, DayParameters> newParameters) {
+        Map<LocalDate, DayParameters> mergedParameters = oldParameters.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+        LocalDate lastDate = newParameters.keySet().iterator().next();
+        DayParameters lastParameters = newParameters.values().iterator().next();
+        if (oldParameters.containsKey(lastDate)) {
+            LOGGER.warning(String.format("Old parameters already had data for date %s, updating.", lastDate));
+            mergedParameters.put(lastDate, lastParameters);
+        } else {
+            LocalDate lastOldDate = oldParameters.keySet().stream()
+                    .max(Comparator.comparing(date -> date))
+                    .orElseThrow(() -> new IllegalArgumentException("Empty old parameters dictionary"));
+
+            Optional<DayParameters> diffParameters = MapMerger.findUpdates(lastParameters,
+                    oldParameters.get(lastOldDate));
+        }
+        return mergedParameters;
+    }
+
     private String localSymbol(String symbol) {
         return symbol.replaceAll("\\.", "-");
     }
@@ -127,7 +187,7 @@ public class FetchFinViz {
                 throw new ParsingException(String.format("Page %s doesn't contain table snapshot-table2 section", url));
             }
             Elements rows = estimates.select("tr");
-            Map<String, String> parameters = rows.stream()
+            List<ParameterRecord> parametersList = rows.stream()
                     .map(row -> {
                         Elements columns = row.select("td");
                         return IntStream.range(0, columns.size() / 2)
@@ -140,17 +200,18 @@ public class FetchFinViz {
 //                                ParameterRecord.of(columns.get(2).text(), columns.get(3).text()));
                     })
                     .flatMap(stream -> stream)
-                    .map(record -> record.label.contains("EPS next Y") && record.value.contains("%")
-                            ? ParameterRecord.of("EPSP next Y", record.value) : record)
-                    //.filter(record -> !record.value.matches("-"))
                     .filter(record -> !record.label.matches("ATR|Index|SMA.*|RSI.*|52W.*|.*Volume|Prev Close|Price|Change"))
-//                    .collect(Collectors.toMap(c -> {
-//                        LOGGER.info(c.getLabel());
-//                        return c.getLabel();
-//                            },
-//                            c -> c.getValue()));
+                    .collect(Collectors.toList());
+
+            Optional<ParameterRecord> firstEps = parametersList.stream()
+                    .filter(record -> record.label.equals("EPS next Y")).findFirst();
+            Map<String, String> parameters = Stream.concat(parametersList.stream()
+                            .filter(record -> !record.label.equals("EPS next Y"))
+                    ,
+                    firstEps.isPresent() ? Stream.of(firstEps.get()) : Stream.empty())
                     .collect(Collectors.toMap(c -> c.getLabel(),
                             c -> c.getValue()));
+//            parameters.put()
 
 //            String list = parameters.keySet().stream()
 //                    .sorted()
@@ -235,8 +296,37 @@ public class FetchFinViz {
 
         public static FinVizVO ofSingleParameters(LocalDate date, Map<String, String> singleParameters, List<AnalystEstimate> analystEstimates, List<InsiderTrade> insiderTradings) {
             Map<LocalDate, DayParameters> parameters = new HashMap<>(1);
-            parameters.put(date, DayParameters.of(date, singleParameters));
+            parameters.put(date, DayParameters.of(singleParameters));
             return of(parameters, analystEstimates, insiderTradings);
+        }
+
+
+        private static final TypeReference<Map<LocalDate, DayParameters>> TYPE_REF_PARAMETERS = new TypeReference<Map<LocalDate, DayParameters>>() {
+        };
+
+        private static final TypeReference<List<AnalystEstimate>> TYPE_REF_ANALYSTS = new TypeReference<List<AnalystEstimate>>() {
+        };
+
+        private static final TypeReference<List<InsiderTrade>> TYPE_REF_INSIDERS = new TypeReference<List<InsiderTrade>>() {
+        };
+
+        public static FinVizVO of(byte[] parameters, byte[] analystEstimates, byte[] insiderTradings) {
+            try {
+                String jsonParameters = GzipUtil.unzip(parameters);
+                Map<LocalDate, DayParameters> parametersObject = OBJECT_MAPPER.readValue(jsonParameters, TYPE_REF_PARAMETERS);
+
+                String jsonAnalysts = GzipUtil.unzip(analystEstimates);
+                List<AnalystEstimate> analystEstimatesObject = OBJECT_MAPPER.readValue(jsonAnalysts, TYPE_REF_ANALYSTS);
+
+                String jsonInsiders = GzipUtil.unzip(insiderTradings);
+                List<InsiderTrade> insiderTradingsObject = OBJECT_MAPPER.readValue(jsonInsiders, TYPE_REF_INSIDERS);
+
+
+                FinVizVO result = new FinVizVO(parametersObject, analystEstimatesObject, insiderTradingsObject);
+                return result;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public byte[] getParametersAsBytes() {
@@ -264,10 +354,6 @@ public class FetchFinViz {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-        }
-
-        public FinVizVO mergeWithOldData(Optional<MarketFinVizDTO> oldFinVizDTO) {
-            return null;
         }
     }
 
