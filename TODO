@@ -37,6 +37,8 @@
 
 t_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
 po 1. dni: 308507,258671,247757
+           349822,258671,249544
+
 
 
 JDBC_DATABASE_URL=$JDBC_DE mvn install

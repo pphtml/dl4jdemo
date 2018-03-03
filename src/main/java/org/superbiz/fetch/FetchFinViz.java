@@ -1,5 +1,10 @@
 package org.superbiz.fetch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.key.LocalDateKeyDeserializer;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.asynchttpclient.*;
@@ -10,11 +15,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.nd4j.shade.jackson.core.JsonProcessingException;
-import org.nd4j.shade.jackson.core.type.TypeReference;
-import org.nd4j.shade.jackson.databind.ObjectMapper;
-import org.nd4j.shade.jackson.databind.SerializationFeature;
-import org.nd4j.shade.jackson.databind.module.SimpleModule;
+//import org.nd4j.shade.jackson.core.JsonProcessingException;
+//import org.nd4j.shade.jackson.core.type.TypeReference;
+//import org.nd4j.shade.jackson.databind.ObjectMapper;
+//import org.nd4j.shade.jackson.databind.SerializationFeature;
+//import org.nd4j.shade.jackson.databind.module.SimpleModule;
 //import org.nd4j.shade.jackson.datatype.joda.deser.key.LocalDateKeyDeserializer;
 import org.superbiz.dao.MarketFinVizDAO;
 import org.superbiz.dao.SecurityDAO;
@@ -64,7 +69,7 @@ public class FetchFinViz {
 
     static {
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addKeyDeserializer(LocalDate.class, new LocalDateDeserializer());
+        simpleModule.addKeyDeserializer(LocalDate.class, LocalDateKeyDeserializer.INSTANCE);
         OBJECT_MAPPER.registerModule(simpleModule);
 
         //OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -73,8 +78,8 @@ public class FetchFinViz {
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchFinViz fetchData = injector.getInstance(FetchFinViz.class);
-        //fetchData.fetchAll();
-        fetchData.findBySymbol("AMZN");
+        fetchData.fetchAll();
+        //fetchData.findBySymbol("AMZN");
     }
 
     private void findBySymbol(String symbol) {
@@ -111,9 +116,9 @@ public class FetchFinViz {
 
                     MarketFinVizDTO marketFinVizDTO = createMarketFinVizDTO()
                             .withSymbol(symbol)
-                            .withParameters(finVizWebResult.getParametersAsBytes())
-                            .withAnalysts(finVizWebResult.getAnalystsAsBytes())
-                            .withInsiders(finVizWebResult.getInsidersAsBytes())
+                            .withParameters(finVizMerged.getParametersAsBytes())
+                            .withAnalysts(finVizMerged.getAnalystsAsBytes())
+                            .withInsiders(finVizMerged.getInsidersAsBytes())
                             .withLastUpdatedSuccess(LocalDateTime.now())
                             .build();
                     marketFinVizDAO.insertOrUpdate(marketFinVizDTO);
@@ -160,7 +165,6 @@ public class FetchFinViz {
         DayParameters lastParameters = newParameters.values().iterator().next();
         if (oldParameters.containsKey(lastDate)) {
             LOGGER.warning(String.format("Old parameters already had data for date %s, updating.", lastDate));
-            mergedParameters.put(lastDate, lastParameters);
         } else {
             LocalDate lastOldDate = oldParameters.keySet().stream()
                     .max(Comparator.comparing(date -> date))
@@ -168,7 +172,14 @@ public class FetchFinViz {
 
             Optional<DayParameters> diffParameters = MapMerger.findUpdates(lastParameters,
                     oldParameters.get(lastOldDate));
+
+            if (diffParameters.isPresent()) {
+                mergedParameters.put(lastOldDate, diffParameters.get());
+            } else {
+                mergedParameters.remove(lastOldDate);
+            }
         }
+        mergedParameters.put(lastDate, lastParameters);
         return mergedParameters;
     }
 

@@ -1,6 +1,6 @@
 package org.superbiz.fetch;
 
-import org.nd4j.shade.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.helpers.MessageFormatter;
 import org.superbiz.fetch.model.ParsingResult;
 import org.superbiz.fetch.model.TickData;

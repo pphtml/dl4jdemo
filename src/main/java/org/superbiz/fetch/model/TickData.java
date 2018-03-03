@@ -1,7 +1,7 @@
 package org.superbiz.fetch.model;
 
-import org.nd4j.shade.jackson.annotation.JsonProperty;
-import org.nd4j.shade.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

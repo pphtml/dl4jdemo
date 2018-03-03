@@ -1,8 +1,8 @@
 package org.superbiz.fetch.model;
 
-import org.nd4j.shade.jackson.annotation.JsonInclude;
-import org.nd4j.shade.jackson.databind.annotation.JsonDeserialize;
-import org.nd4j.shade.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.superbiz.util.DiffAttribute;
 import org.superbiz.util.LocalDateDeserializer;
 import org.superbiz.util.LocalDateSerializer;

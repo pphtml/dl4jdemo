@@ -1,7 +1,7 @@
 package org.superbiz.fetch.model.finviz;
 
-import org.nd4j.shade.jackson.databind.annotation.JsonDeserialize;
-import org.nd4j.shade.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.superbiz.util.LocalDateDeserializer;
 import org.superbiz.util.LocalDateSerializer;
 

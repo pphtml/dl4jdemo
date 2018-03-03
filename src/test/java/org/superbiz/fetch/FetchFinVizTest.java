@@ -68,6 +68,8 @@ public class FetchFinVizTest {
         FinVizVO finVizVO = createSampleFinVizVO();
 
         FinVizVO mergedFinVizVO = fetchFinViz.mergeFinVizData(Optional.of(marketFinVizDTO), finVizVO);
+
+        System.out.println(mergedFinVizVO);
     }
 
     private MarketFinVizDTO createSampleMarketFinVizDTO() {
@@ -122,7 +124,7 @@ public class FetchFinVizTest {
                         "15,482", "215,045", "75,937", "Feb 06 04:35 PM")
         );
 
-        return FinVizVO.ofSingleParameters(LocalDate.parse("2018-02-26"), parameters,
+        return FinVizVO.ofSingleParameters(LocalDate.parse("2018-02-27"), parameters,
                 analystEstimates, insiderTradings);
     }
 }

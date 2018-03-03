@@ -1,8 +1,8 @@
 package org.superbiz.util;
 
-import org.nd4j.shade.jackson.core.JsonProcessingException;
-import org.nd4j.shade.jackson.core.type.TypeReference;
-import org.nd4j.shade.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.superbiz.fetch.model.MarketWatchData;
 import org.superbiz.fetch.model.TickData;
 
