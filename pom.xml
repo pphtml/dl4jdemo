@@ -25,7 +25,8 @@
         <!--<dl4j.spark.version>0.9.1_spark_1</dl4j.spark.version>-->
         <!--<datavec.spark.version>0.9.1_spark_1</datavec.spark.version>-->
         <guice.version>4.1.0</guice.version>
-        <HikariCP.version>2.7.6</HikariCP.version>
+        <version.ratpack>1.5.0</version.ratpack>
+        <!--<HikariCP.version>2.7.6</HikariCP.version>-->
     </properties>
 
     <build>
@@ -61,18 +62,18 @@
                     <javaTimeTypes>true</javaTimeTypes>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-dependency-plugin</artifactId>-->
-                <!--<version>3.0.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>copy-dependencies</id>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals><goal>copy-dependencies</goal></goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals><goal>copy-dependencies</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -117,23 +118,38 @@
             <version>${version.postgresql}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.hubspot.dropwizard</groupId>
-            <artifactId>dropwizard-guice</artifactId>
-            <version>1.0.6.0</version>
-        </dependency>
-
         <!--<dependency>-->
-            <!--<groupId>io.dropwizard</groupId>-->
-            <!--<artifactId>dropwizard-core</artifactId>-->
-            <!--<version>1.2.4</version>-->
+            <!--<groupId>com.google.inject</groupId>-->
+            <!--<artifactId>guice</artifactId>-->
+            <!--<version>${guice.version}</version>-->
         <!--</dependency>-->
+
+        <dependency>
+            <groupId>io.ratpack</groupId>
+            <artifactId>ratpack-core</artifactId>
+            <version>${version.ratpack}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ratpack</groupId>
+            <artifactId>ratpack-test</artifactId>
+            <version>${version.ratpack}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ratpack</groupId>
+            <artifactId>ratpack-hikari</artifactId>
+            <version>${version.ratpack}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.ratpack</groupId>-->
+            <!--<artifactId>ratpack-rx</artifactId>-->
+            <!--<version>${version.ratpack}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>io.ratpack</groupId>-->
+        <!--<artifactId>ratpack-session</artifactId>-->
+        <!--<version>${version.ratpack}</version>-->
+        <!--</dependency>-->
+
 
         <dependency>
             <groupId>net.lamberto.junit</groupId>
@@ -142,11 +158,11 @@
             <!--<scope>test</scope>-->
         </dependency>
 
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${HikariCP.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zaxxer</groupId>-->
+            <!--<artifactId>HikariCP</artifactId>-->
+            <!--<version>${HikariCP.version}</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.jsoup</groupId>

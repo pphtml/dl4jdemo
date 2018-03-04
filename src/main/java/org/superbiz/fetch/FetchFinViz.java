@@ -90,7 +90,7 @@ public class FetchFinViz {
         }
     }
 
-    private void fetchAll() throws IOException {
+    public void fetchAll() throws IOException {
         LOGGER.info("Starting");
         try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
 
