@@ -1,6 +1,7 @@
 package org.superbiz.web;
 
 import org.superbiz.guice.BasicModule;
+import org.superbiz.util.GlobalInit;
 import org.superbiz.util.LoggingConfig;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
@@ -8,10 +9,11 @@ import ratpack.server.RatpackServer;
 import java.util.logging.Logger;
 
 public class DemoServer {
-    static {
-        System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
-        System.setProperty("org.jooq.no-logo", "true");
-    }
+    static { GlobalInit.init(); }
+//    static {
+//        System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
+//        System.setProperty("org.jooq.no-logo", "true");
+//    }
 
     private static final Logger logger = Logger.getLogger(DemoServer.class.getName());
 
@@ -64,9 +66,10 @@ public class DemoServer {
 //
 //                                    ctx.render(String.format("done"));
 //                                })
+                                .get("status", ctx -> ctx.render("OK"))
                                 .get("finviz", DemoHandler.class)
-                                .files(f -> f.dir("static"))
-                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
+//                                .files(f -> f.dir("static"))
+//                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
                 ));
 
 //        if (getDevMode()) {

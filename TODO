@@ -1,6 +1,4 @@
-- web server
-  - REST pro cteni finviz
-  - poresit DB
+- ^GSPC pro finviz
 - casovac
 - rozpoznani obchodniho dne
 - merge Price

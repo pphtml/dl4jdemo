@@ -182,6 +182,12 @@
             <version>${jcommon.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.deeplearning4j</groupId>-->
             <!--<artifactId>dl4j-spark-nlp_2.11</artifactId>-->
