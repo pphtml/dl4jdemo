@@ -23,6 +23,7 @@ public class DemoServer {
         // Registry.builder().add(FileRenderer.TYPE, FileRenderer.NON_CACHING);
 //        final Runnable task = () -> watchResourcesDirectory();
 //        new Thread(task).start();
+        MainScheduler.startScheduler();
 
         RatpackServer.start(server -> server
                 .serverConfig(config -> config

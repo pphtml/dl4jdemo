@@ -18,6 +18,11 @@ public class MainScheduler {
     private static final Logger LOGGER = Logger.getLogger(MainScheduler.class.getName());
 
     public static void main(String[] args) throws SchedulerException {
+        startScheduler();
+        return;
+    }
+
+    public static void startScheduler() throws SchedulerException {
         SchedulerFactory schedulerFactory = new StdSchedulerFactory();
         Scheduler scheduler = schedulerFactory.getScheduler();
         JobDetail job = JobBuilder.newJob(FetchFinVizJob.class)
@@ -38,8 +43,9 @@ public class MainScheduler {
 
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
                 .withIdentity("trigger3", "group1")
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 58 15 * * ?"))
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 59 15 * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 05 16 * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 06 16 * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 07 16 * * ?"))
                 //.withSchedule(CronScheduleBuilder.cronSchedule("0/10 * * * * ?"))
                 //.withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * * * ?"))
                 //.forJob("myJob", "group1")
