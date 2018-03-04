@@ -6,6 +6,8 @@ import org.superbiz.util.LoggingConfig;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 public class DemoServer {
@@ -67,6 +69,7 @@ public class DemoServer {
 //                                    ctx.render(String.format("done"));
 //                                })
                                 .get("status", ctx -> ctx.render("OK"))
+                                .get("datetime", ctx -> ctx.render(LocalDateTime.now().toString()))
                                 .get("finviz", DemoHandler.class)
 //                                .files(f -> f.dir("static"))
 //                                .all(ctx -> ctx.render(ctx.file("static/index.html")))

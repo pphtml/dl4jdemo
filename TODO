@@ -39,3 +39,4 @@ po 1. dni: 308507,258671,247757
 
 
 JDBC_DATABASE_URL=$JDBC_DE mvn install
+wixi
