@@ -39,6 +39,10 @@ public class DateConverter {
         return date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
     }
 
+    public static Date fromLocalDate(LocalDate date) {
+        return date != null ? Date.valueOf(date) : null;
+    }
+
     public static Timestamp fromLocalDateTime(LocalDateTime dateTime) {
         return dateTime != null ? Timestamp.valueOf(dateTime) : null;
     }

@@ -6,6 +6,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.superbiz.fetch.FetchFinViz;
 import org.superbiz.guice.BasicModule;
+import org.superbiz.service.TradingDayService;
 import org.superbiz.util.GlobalInit;
 
 import java.io.IOException;
@@ -43,11 +44,9 @@ public class MainScheduler {
 
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
                 .withIdentity("trigger3", "group1")
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 05 16 * * ?"))
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 06 16 * * ?"))
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 07 16 * * ?"))
+//                .withSchedule(CronScheduleBuilder.cronSchedule("0 07 16 * * ?"))
                 //.withSchedule(CronScheduleBuilder.cronSchedule("0/10 * * * * ?"))
-                //.withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * * * ?"))
                 //.forJob("myJob", "group1")
                 .build();
 
@@ -61,7 +60,10 @@ public class MainScheduler {
             try {
                 Injector injector = Guice.createInjector(new BasicModule());
                 FetchFinViz fetchData = injector.getInstance(FetchFinViz.class);
-                fetchData.fetchAll();
+                TradingDayService tradingDayService = injector.getInstance(TradingDayService.class);
+                if (tradingDayService.isBeforeTradingStart()) {
+                    fetchData.fetchAll();
+                }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw new JobExecutionException(e);

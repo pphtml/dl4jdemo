@@ -1,11 +1,9 @@
 - ^GSPC pro finviz
-- casovac
-- rozpoznani obchodniho dne
 - merge Price
 - yahoo events
 - initial data dump - securities
 - automaticka kopie dat pred ctenim novych dat
-- readFromDB - timezone & timestamp
+- com.zaxxer.hikari.HikariDataSource <init> MyHikariCP - Starting - vyhodit z logu
 - referencni integrita ?
 -----------------------------------------------------------------
 - automaticke trideni classes na konec
