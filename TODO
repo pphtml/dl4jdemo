@@ -1,8 +1,8 @@
-- ^GSPC pro finviz
 - merge Price
 - yahoo events
 - initial data dump - securities
 - automaticka kopie dat pred ctenim novych dat
+- logging@heroku - jeden radek
 - com.zaxxer.hikari.HikariDataSource <init> MyHikariCP - Starting - vyhodit z logu
 - check na to ze job muze byt spusteny pouze jednou - 1 quartz worker thread?
 - referencni integrita ?

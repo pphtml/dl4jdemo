@@ -2,11 +2,9 @@ package org.superbiz.web;
 
 import org.superbiz.guice.BasicModule;
 import org.superbiz.util.GlobalInit;
-import org.superbiz.util.LoggingConfig;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
@@ -32,7 +30,7 @@ public class DemoServer {
                 .registry(Guice.registry(bindings -> bindings
 //                        .bind(VehiclePositions.class)
 //                        .bind(ThreadDumpHandler.class)
-                        .bind(DemoHandler.class)
+                        .bind(FinVizHandler.class)
 //                        .moduleConfig(ApplicationModule.class, bindings.getServerConfig().get("/user", ApplicationModule.Config.class))
 //                        .moduleConfig(HikariModule.class, getHikariConfig())
                         .module(BasicModule.class)))
@@ -71,7 +69,7 @@ public class DemoServer {
 //                                })
                                 .get("status", ctx -> ctx.render("OK"))
                                 .get("datetime", ctx -> ctx.render(LocalDateTime.now().toString()))
-                                .get("finviz", DemoHandler.class)
+                                .path("finviz", FinVizHandler.class)
 //                                .files(f -> f.dir("static"))
 //                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
                 ));

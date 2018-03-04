@@ -2,6 +2,7 @@ package org.superbiz.dao;
 
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record5;
 import org.jooq.Result;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
@@ -10,10 +11,12 @@ import org.superbiz.fetch.FetchFinViz;
 
 import javax.inject.Inject;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.superbiz.model.jooq.Tables.MARKET_FIN_VIZ;
 import static org.superbiz.util.DateConverter.fromLocalDateTime;
@@ -125,6 +128,26 @@ public class MarketFinVizDAO {
             return record != null ?
                     Optional.of(convertRecordToMarketFinVizDTO(record)) :
                     Optional.empty();
+        }
+    }
+
+    public List<MarketFinVizDTO> readStatuses() {
+        try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
+            Result<Record5<String, Timestamp, String, Timestamp, String>> records = dsl.getDsl()
+                    .select(MARKET_FIN_VIZ.SYMBOL, MARKET_FIN_VIZ.LAST_UPDATED_ERROR, MARKET_FIN_VIZ.LAST_ERROR,
+                            MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS, MARKET_FIN_VIZ.LAST_WARNING)
+                    .from(MARKET_FIN_VIZ)
+                    .orderBy(MARKET_FIN_VIZ.SYMBOL)
+                    .fetch();
+            return records.stream()
+                    .map(r -> MarketFinVizDTO.MarketFinVizDTOBuilder.createMarketFinVizDTO()
+                            .withSymbol(r.get(MARKET_FIN_VIZ.SYMBOL))
+                            .withLastUpdatedSuccess(toLocalDateTime(r.get(MARKET_FIN_VIZ.LAST_UPDATED_SUCCESS)))
+                            .withLastUpdatedError(toLocalDateTime(r.get(MARKET_FIN_VIZ.LAST_UPDATED_ERROR)))
+                            .withLastError(r.get(MARKET_FIN_VIZ.LAST_ERROR))
+                            .withLastWarning(r.get(MARKET_FIN_VIZ.LAST_WARNING))
+                            .build())
+                    .collect(Collectors.toList());
         }
     }
 }
