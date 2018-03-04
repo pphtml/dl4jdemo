@@ -4,6 +4,7 @@
 - initial data dump - securities
 - automaticka kopie dat pred ctenim novych dat
 - com.zaxxer.hikari.HikariDataSource <init> MyHikariCP - Starting - vyhodit z logu
+- check na to ze job muze byt spusteny pouze jednou - 1 quartz worker thread?
 - referencni integrita ?
 -----------------------------------------------------------------
 - automaticke trideni classes na konec

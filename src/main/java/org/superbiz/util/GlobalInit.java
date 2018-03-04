@@ -6,6 +6,7 @@ public class GlobalInit {
 
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
         System.setProperty("org.jooq.no-logo", "true");
+        System.setProperty("org.quartz.threadPool.threadCount", "1");
     }
 
     public static void init() {
