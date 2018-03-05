@@ -6,6 +6,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class ConnectionPool {
     private ConnectionPool() {
     }
+
+    public static final HikariDataSource HIKARI_DATA_SOURCE = getDataSource();
     /*
      * Expects a config in the following format
      *
@@ -22,7 +24,8 @@ public class ConnectionPool {
      *
      * Let HikariCP bleed out here on purpose
      */
-    public static HikariDataSource getDataSource() {
+    private static HikariDataSource getDataSource() {
+        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXX");
         HikariConfig jdbcConfig = new HikariConfig();
         jdbcConfig.setPoolName("MyHikariCP");
         jdbcConfig.setMaximumPoolSize(4);

@@ -28,7 +28,8 @@ public class TradingDayService {
         logger.info(String.format("Checking isBeforeTradingStart, NY: %s, weekend: %s, holiday: %s, beforeTrading: %s, result: %s",
                 timeNY, weekend, holiday, periodBeforeTrading, result));
 
-        return result;
+        // return result;
+        return true;
     }
 
     public static void main(String[] args) {
