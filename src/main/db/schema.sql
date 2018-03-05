@@ -36,6 +36,17 @@ CREATE TABLE marketwatch
   history TEXT
 );
 
+CREATE TABLE price_1m
+(
+  symbol VARCHAR(10) NOT NULL
+    CONSTRAINT price_pkey_1m
+    PRIMARY KEY,
+  data TEXT NOT NULL,
+  last_updated TIMESTAMP,
+  last_error TEXT,
+  last_updated_error TIMESTAMP
+);
+
 CREATE TABLE price_5m
 (
   symbol VARCHAR(10) NOT NULL
@@ -58,3 +69,39 @@ CREATE TABLE market_fin_viz
   last_error TEXT,
   last_warning TEXT
 );
+
+CREATE TABLE public.non_trading_days
+(
+  date DATE PRIMARY KEY NOT NULL
+);
+
+INSERT INTO public.non_trading_days (date) VALUES ('2018-03-30');
+INSERT INTO public.non_trading_days (date) VALUES ('2018-05-28');
+INSERT INTO public.non_trading_days (date) VALUES ('2018-07-04');
+INSERT INTO public.non_trading_days (date) VALUES ('2018-09-03');
+INSERT INTO public.non_trading_days (date) VALUES ('2018-11-22');
+INSERT INTO public.non_trading_days (date) VALUES ('2018-12-25');
+
+INSERT INTO public.non_trading_days (date) VALUES ('2019-01-01');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-01-21');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-02-18');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-04-19');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-05-27');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-07-04');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-09-02');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-11-28');
+INSERT INTO public.non_trading_days (date) VALUES ('2019-12-25');
+
+INSERT INTO public.non_trading_days (date) VALUES ('2020-01-01');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-01-20');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-02-17');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-04-10');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-05-25');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-07-03');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-09-07');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-11-26');
+INSERT INTO public.non_trading_days (date) VALUES ('2020-12-25');
+
+
+select * from price_5m;
+delete from price_5m;

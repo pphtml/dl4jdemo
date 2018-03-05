@@ -25,7 +25,6 @@ public class TickDataConverter {
 
     public static List<TickData> jsonAsTickData(String json) {
         try {
-            System.out.println(json);
             List<TickData> result = objectMapper.readValue(json, VALUE_TYPE_REF);
             return result;
         } catch (IOException e) {

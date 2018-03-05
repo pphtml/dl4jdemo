@@ -1,10 +1,11 @@
-- merge Price
-- yahoo events
+- zabstraktnit PriceDAO
+- NetFetcherYahoo - zabstraktnit
+- skript SQL pro non_trading_days
+- hlidani uz ulozenych zaznamu pro fetchdata
 - initial data dump - securities
 - automaticka kopie dat pred ctenim novych dat
 - logging@heroku - jeden radek
 - com.zaxxer.hikari.HikariDataSource <init> MyHikariCP - Starting - vyhodit z logu
-- check na to ze job muze byt spusteny pouze jednou - 1 quartz worker thread?
 - referencni integrita ?
 -----------------------------------------------------------------
 - automaticke trideni classes na konec

@@ -10,6 +10,7 @@ public class YahooEvents {
     //            }
     //          }
     private Map <Long, YahooDividend> dividends;
+    private Map <Long, YahooSplit> splits;
 
     public Map<Long, YahooDividend> getDividends() {
         return dividends;
@@ -17,5 +18,13 @@ public class YahooEvents {
 
     public void setDividends(Map<Long, YahooDividend> dividends) {
         this.dividends = dividends;
+    }
+
+    public Map<Long, YahooSplit> getSplits() {
+        return splits;
+    }
+
+    public void setSplits(Map<Long, YahooSplit> splits) {
+        this.splits = splits;
     }
 }

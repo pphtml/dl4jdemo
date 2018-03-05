@@ -14,14 +14,17 @@ public class TickData {
     private BigDecimal low;
     private BigDecimal close;
     private Long volume;
+    private List<Event> events;
 
-    public TickData(Long timestamp, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume) {
+    public TickData(Long timestamp, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, Long volume,
+                    List<Event> events) {
         this.timestamp = timestamp;
         this.open = open;
         this.high = high;
         this.low = low;
         this.close = close;
         this.volume = volume;
+        this.events = events;
     }
 
     public TickData() {
@@ -29,7 +32,12 @@ public class TickData {
 
     public static TickData from(Long timestamp, BigDecimal open, BigDecimal high, BigDecimal low,
                                 BigDecimal close, Long volume) {
-        return new TickData(timestamp, round(open), round(high), round(low), round(close), volume);
+        return new TickData(timestamp, round(open), round(high), round(low), round(close), volume, null);
+    }
+
+    public static TickData from(Long timestamp, BigDecimal open, BigDecimal high, BigDecimal low,
+                                BigDecimal close, Long volume, List<Event> events) {
+        return new TickData(timestamp, round(open), round(high), round(low), round(close), volume, events);
     }
 
     private static BigDecimal round(BigDecimal priceValue) {
@@ -57,6 +65,7 @@ public class TickData {
         sb.append(", low=").append(low);
         sb.append(", close=").append(close);
         sb.append(", volume=").append(volume);
+        sb.append(", events=").append(events);
         sb.append('}');
         return sb.toString();
     }
@@ -113,5 +122,14 @@ public class TickData {
 
     public void setVolume(Long volume) {
         this.volume = volume;
+    }
+
+    @JsonProperty("e")
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }

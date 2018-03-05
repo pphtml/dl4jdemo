@@ -17,7 +17,7 @@
 
         <dl4j.version>0.9.1</dl4j.version>
         <async-http-client.version>2.4.1</async-http-client.version>
-        <version.postgresql>42.1.4</version.postgresql>
+        <version.postgresql>42.2.1</version.postgresql>
         <version.jooq>3.10.5</version.jooq>
         <jfreechart.version>1.0.13</jfreechart.version>
         <jcommon.version>1.0.23</jcommon.version>

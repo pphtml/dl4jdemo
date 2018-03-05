@@ -1,12 +1,20 @@
 package org.superbiz.service;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.superbiz.dao.NonTradingDayDAO;
+import org.superbiz.fetch.FetchData;
+import org.superbiz.guice.BasicModule;
+import org.superbiz.util.GlobalInit;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.time.*;
 import java.util.logging.Logger;
 
 public class TradingDayService {
+    static { GlobalInit.init(); }
+
     @Inject
     Logger logger;
 
@@ -28,11 +36,12 @@ public class TradingDayService {
         logger.info(String.format("Checking isBeforeTradingStart, NY: %s, weekend: %s, holiday: %s, beforeTrading: %s, result: %s",
                 timeNY, weekend, holiday, periodBeforeTrading, result));
 
-        // return result;
-        return true;
+        return result;
     }
 
     public static void main(String[] args) {
-        new TradingDayService().isBeforeTradingStart();
+        Injector injector = Guice.createInjector(new BasicModule());
+        TradingDayService tradingDayService = injector.getInstance(TradingDayService.class);
+        tradingDayService.isBeforeTradingStart();
     }
 }

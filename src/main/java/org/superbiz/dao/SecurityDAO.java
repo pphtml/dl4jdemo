@@ -18,7 +18,7 @@ public class SecurityDAO {
     public void findAll() {
         try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
             Result<Record> securities = dsl.getDsl().select().from(SECURITY).orderBy(SECURITY.SYMBOL).fetch();
-            System.out.println(securities);
+            //System.out.println(securities);
         }
     }
 

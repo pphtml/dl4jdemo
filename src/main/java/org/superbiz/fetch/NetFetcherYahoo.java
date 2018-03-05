@@ -2,30 +2,28 @@ package org.superbiz.fetch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.helpers.MessageFormatter;
-import org.superbiz.fetch.model.ParsingResult;
-import org.superbiz.fetch.model.TickData;
-import org.superbiz.fetch.model.YahooChart;
-import org.superbiz.fetch.model.YahooData;
-import org.superbiz.fetch.model.YahooError;
-import org.superbiz.fetch.model.YahooIndicators;
-import org.superbiz.fetch.model.YahooQuote;
-import org.superbiz.fetch.model.YahooResult;
+import org.superbiz.fetch.model.*;
 import org.superbiz.util.DateConverter;
 import org.superbiz.util.GlobalInit;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.superbiz.fetch.model.Event.EventBuilder.createEvent;
 
 public class NetFetcherYahoo {
     private static final GlobalInit globalInit = new GlobalInit();
 
     public String createUrl(String symbol) {
         LocalDate dateEnd = LocalDate.now().plusDays(1);
-        LocalDate dateStart = dateEnd.minusDays(60);
+        //LocalDate dateStart = dateEnd.minusDays(60);
+        LocalDate dateStart = dateEnd.minusDays(7);
 
 
 //        String url = "https://query2.finance.yahoo.com/v7/finance/chart/{{symbol}}?' \
@@ -47,7 +45,8 @@ public class NetFetcherYahoo {
                 "symbol=%s&" +
                 "period1=%d&" +
                 "period2=%d&" +
-                "interval=5m&" +
+                "interval=1m&" +
+                //"interval=5m&" +
                 "indicators=quote&" +
                 "includeTimestamps=true&" +
                 "includePrePost=false&" +
@@ -96,23 +95,53 @@ public class NetFetcherYahoo {
         final List<BigDecimal> lows = quoteLists.getLow();
         final List<BigDecimal> closes = quoteLists.getClose();
         final List<Long> volumes = quoteLists.getVolume();
+        final YahooEvents events = yahooData.getEvents();
         if (timestamps.size() != opens.size()) {
             throw new ParsingException(String.format("Number of timestamps and opening values differs for %s (%s != %s)",
                     symbol, timestamps.size(), opens.size()));
         }
 
         List<TickData> listOfTickData = IntStream.range(0, timestamps.size())
-                .mapToObj(index -> TickData.from(timestamps.get(index),
-                        opens.get(index),
-                        highs.get(index),
-                        lows.get(index),
-                        closes.get(index),
-                        volumes.get(index)))
+                .mapToObj(index -> {
+                    final Long timestamp = timestamps.get(index);
+                    TickData tickData = TickData.from(timestamp,
+                            opens.get(index),
+                            highs.get(index),
+                            lows.get(index),
+                            closes.get(index),
+                            volumes.get(index));
+                    if (events != null) {
+                        List<Event> eventList = new ArrayList<>();
+                        if (events.getDividends() != null) {
+                            YahooDividend dividend = events.getDividends().get(timestamp);
+                            if (dividend != null) {
+                                Event event = createEvent()
+                                        .withEventType(EventType.DIVIDEND)
+                                        .withAmount(dividend.getAmount())
+                                        .build();
+                                eventList.add(event);
+                            }
+                        }
+                        if (events.getSplits() != null) {
+                            YahooSplit split = events.getSplits().get(timestamp);
+                            if (split != null) {
+                                Event event = createEvent()
+                                        .withEventType(EventType.SPLIT)
+                                        .withNumerator(split.getNumerator())
+                                        .withDenominator(split.getDenominator())
+                                        .build();
+                                eventList.add(event);
+                            }
+                        }
+                        tickData.setEvents(eventList);
+                    }
+                    return tickData;
+                })
                 .collect(Collectors.toList());
         return listOfTickData;
     }
 
     public static void main(String[] args) {
-        // new NetFetcherYahoo().fetch("AMZN");
+        System.out.println(new NetFetcherYahoo().createUrl("AMZN"));
     }
 }

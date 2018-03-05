@@ -25,7 +25,6 @@ public class ConnectionPool {
      * Let HikariCP bleed out here on purpose
      */
     private static HikariDataSource getDataSource() {
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXX");
         HikariConfig jdbcConfig = new HikariConfig();
         jdbcConfig.setPoolName("MyHikariCP");
         jdbcConfig.setMaximumPoolSize(4);

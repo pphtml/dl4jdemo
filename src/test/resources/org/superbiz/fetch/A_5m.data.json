@@ -3418,6 +3418,14 @@
               "amount": 0.149,
               "date": 1514557800
             }
+          },
+          "splits": {
+            "1519675800": {
+              "date": 1519675800,
+              "numerator": 4,
+              "denominator": 5,
+              "splitRatio": "5/4"
+            }
           }
         },
         "indicators": {

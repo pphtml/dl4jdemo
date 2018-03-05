@@ -46,7 +46,7 @@ public class MainScheduler {
                 .withIdentity("trigger3", "group1")
 //                .withSchedule(CronScheduleBuilder.cronSchedule("0 07 16 * * ?"))
                 //.withSchedule(CronScheduleBuilder.cronSchedule("0/10 * * * * ?"))
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/15 * * * ?"))
                 //.forJob("myJob", "group1")
                 .build();
 
