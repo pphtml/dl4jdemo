@@ -59,9 +59,9 @@ public class MainScheduler {
                     fetchFinViz.fetchAll();
                 }
 
-                //if (tradingDayService.isPricesReadyForBackup()) {
+                if (tradingDayService.isPricesReadyForBackup()) {
                     fetchData.fetchAllIntervals();
-                //}
+                }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw new JobExecutionException(e);

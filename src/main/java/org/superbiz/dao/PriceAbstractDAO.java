@@ -1,9 +1,6 @@
 package org.superbiz.dao;
 
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Result;
-import org.jooq.TableField;
+import org.jooq.*;
 import org.jooq.impl.TableImpl;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
@@ -126,6 +123,25 @@ public abstract class PriceAbstractDAO {
                     .where(getTableFieldLastUpdated().gt(fromLocalDateTime(dateTime)))
                     .fetch();
             return symbols.stream().map(r -> r.value1()).collect(Collectors.toList());
+        }
+    }
+
+    public List<PriceDTO> readStatuses() {
+        try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
+            Result<Record4<String, Timestamp, String, Timestamp>> records = dsl.getDsl()
+                    .select(getTableFieldSymbol(), getTableFieldLastUpdated(),
+                            getTableFieldLastError(), getTableFieldLastUpdatedError())
+                    .from(getTableName())
+                    .orderBy(getTableFieldSymbol())
+                    .fetch();
+            return records.stream()
+                    .map(record -> PriceDTO.PriceDTOBuilder.createPriceDTO()
+                    .withSymbol(record.get(getTableFieldSymbol()))
+                    .withLastUpdated(DateConverter.toLocalDateTime(record.get(getTableFieldLastUpdated())))
+                    .withLastError(record.get(getTableFieldLastError()))
+                    .withLastUpdatedError(DateConverter.toLocalDateTime(record.get(getTableFieldLastUpdatedError())))
+                    .build())
+                    .collect(Collectors.toList());
         }
     }
 }

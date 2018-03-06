@@ -31,6 +31,7 @@ public class DemoServer {
 //                        .bind(VehiclePositions.class)
 //                        .bind(ThreadDumpHandler.class)
                         .bind(FinVizHandler.class)
+                        .bind(PricesHandler.class)
 //                        .moduleConfig(ApplicationModule.class, bindings.getServerConfig().get("/user", ApplicationModule.Config.class))
 //                        .moduleConfig(HikariModule.class, getHikariConfig())
                         .module(BasicModule.class)))
@@ -70,6 +71,7 @@ public class DemoServer {
                                 .get("status", ctx -> ctx.render("OK"))
                                 .get("datetime", ctx -> ctx.render(LocalDateTime.now().toString()))
                                 .path("finviz", FinVizHandler.class)
+                                .path("prices", PricesHandler.class)
 //                                .files(f -> f.dir("static"))
 //                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
                 ));
