@@ -20,14 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.superbiz.fetch.FetchData.pricesLinkedMapFromList;
 
-public class NetFetcherYahooTest {
+public class NetFetcherYahoo5MinTest {
     private NetFetcherYahoo netFetcherYahoo = new NetFetcherYahoo();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void fetch() {
+    public void fetch() throws ParsingException {
         String data = Utils.readResourceToString(getClass(), "A_5m.data.json");
         //String data = Utils.readResourceToString(getClass(), "AMZN_5m.data.json");
 
@@ -50,12 +50,10 @@ public class NetFetcherYahooTest {
         assertNotNull(event);
         assertEquals(EventType.DIVIDEND, event.getEventType());
         assertEquals(new BigDecimal("0.149"), event.getAmount());
-
-        System.out.println(TickDataConverter.tickDataAsJson(result.getTickData()));
     }
 
     @Test
-    public void fetchDelisted() {
+    public void fetchDelisted() throws ParsingException {
         expectedException.expect(DataProcessingException.class);
         expectedException.expectMessage("Code: Not Found, Description: No data found, symbol may be delisted");
 

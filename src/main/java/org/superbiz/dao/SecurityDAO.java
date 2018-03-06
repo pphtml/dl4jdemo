@@ -28,15 +28,24 @@ public class SecurityDAO {
         }
     }
 
-    public Result<Record> findAllSecuritiesExcept(List<String> symbols) {
+    public Result<Record> findAllSecuritiesExcept(List<String> symbols, boolean includeIndex) {
         try (ConnAndDSL3 dsl = connAndDSLProvider.create()) {
-            return dsl.getDsl()
-                    .select()
-                    .from(SECURITY)
-                    .where(SECURITY.SYMBOL.notIn(symbols))
-                      .and(SECURITY.INDEX.eq(false))
-                    .orderBy(SECURITY.SYMBOL)
-                    .fetch();
+            if (includeIndex) {
+                return dsl.getDsl()
+                        .select()
+                        .from(SECURITY)
+                        .where(SECURITY.SYMBOL.notIn(symbols))
+                        .orderBy(SECURITY.SYMBOL)
+                        .fetch();
+            } else {
+                return dsl.getDsl()
+                        .select()
+                        .from(SECURITY)
+                        .where(SECURITY.SYMBOL.notIn(symbols))
+                          .and(SECURITY.INDEX.eq(false))
+                        .orderBy(SECURITY.SYMBOL)
+                        .fetch();
+            }
         }
     }
 

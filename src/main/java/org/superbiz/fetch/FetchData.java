@@ -6,10 +6,7 @@ import org.asynchttpclient.*;
 import org.asynchttpclient.util.HttpConstants;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.superbiz.dao.Price1mDAO;
-import org.superbiz.dao.Price5mDAO;
-import org.superbiz.dao.PriceAbstractDAO;
-import org.superbiz.dao.SecurityDAO;
+import org.superbiz.dao.*;
 import org.superbiz.dto.PriceDTO;
 import org.superbiz.fetch.model.ParsingResult;
 import org.superbiz.fetch.model.TickData;
@@ -20,7 +17,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -49,31 +45,37 @@ public class FetchData {
 
     @Inject
     Price1mDAO price1mDAO;
-//    @Inject
-//    Price5mDAO price5mDAO;
+    @Inject
+    Price5mDAO price5mDAO;
+    @Inject
+    Price1dDAO price1dDAO;
 
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
-        fetchData.fetchSuperAll();
+        fetchData.fetchAllIntervals();
         //PriceDTO price = fetchData.readFromDB("AMZN");
     }
 
-    private void fetchSuperAll() throws IOException {
-        fetchAll(price1mDAO);
+    public void fetchAllIntervals() throws IOException {
+        fetchAll(price1mDAO, "1m", 7);
+        fetchAll(price5mDAO, "5m", 60);
+//        fetchAll(price1dDAO, "1d", 3650);
     }
 
 //    private Optional<PriceDTO> readFromDB(String symbol) {
 //        return price5mDAO.read(symbol);
 //    }
 
-    private void fetchAll(PriceAbstractDAO priceDAO) throws IOException {
-        LOGGER.info("Starting");
+    private void fetchAll(PriceAbstractDAO priceDAO, String interval, Integer daysBack) throws IOException {
+        LOGGER.info(String.format("Starting for interval %s", interval));
         try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
-            Result<Record> securities = securityDAO.fetchAll();
+
+            List<String> knownSecurities = priceDAO.findFreshDataSymbols(LocalDateTime.now().minusHours(6));
+            Result<Record> securities = securityDAO.findAllSecuritiesExcept(knownSecurities, true);
             securities.stream().forEach(security -> {
                 String symbol = security.get(SECURITY.SYMBOL);
-                String url = netFetcherYahoo.createUrl(symbol);
+                String url = netFetcherYahoo.createUrl(symbol, interval, daysBack);
                 Request getRequest = new RequestBuilder(HttpConstants.Methods.GET)
                         .setUrl(url)
                         .build();
@@ -93,7 +95,7 @@ public class FetchData {
                     final Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
                     PriceDTO mergedPriceDTO = mergePriceDTOs(oldOptionalPriceDTO, newPriceDTO);
                     priceDAO.insertOrUpdate(mergedPriceDTO);
-                } catch (InterruptedException | ExecutionException | DataProcessingException e) {
+                } catch (InterruptedException | ExecutionException | DataProcessingException | ParsingException e) {
                     LOGGER.log(Level.WARNING, String.format("Cannot read Trading Tick data for %s, reason: %s",
                             symbol, e.getMessage()), e);
                     String errorMessageForDB = String.format("%s: %s", e.getClass(), e.getMessage());
@@ -110,7 +112,7 @@ public class FetchData {
     }
 
     PriceDTO mergePriceDTOs(Optional<PriceDTO> oldOptionalPriceDTO, PriceDTO newPriceDTO) {
-        if (oldOptionalPriceDTO.isPresent()) {
+        if (oldOptionalPriceDTO.isPresent() && oldOptionalPriceDTO.get().getData() != null) {
 
             LinkedHashMap<Long, TickData> linkedMap = pricesLinkedMapFromList(oldOptionalPriceDTO.get().getData());
 

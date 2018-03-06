@@ -44,4 +44,22 @@ public class TradingDayService {
         TradingDayService tradingDayService = injector.getInstance(TradingDayService.class);
         tradingDayService.isBeforeTradingStart();
     }
+
+    public boolean isPricesReadyForBackup() {
+        LocalDateTime timeNY = LocalDateTime.now(ZoneId.of("America/New_York"));
+
+        LocalDate date = timeNY.toLocalDate();
+        LocalTime time = timeNY.toLocalTime();
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        boolean weekend = dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
+        boolean holiday = nonTradingDayDAO.isHoliday(date);
+        boolean periodForPriceFetch = time.getHour() >= 23;
+
+        boolean result = !weekend && !holiday && periodForPriceFetch;
+
+        logger.info(String.format("Checking isPricesReadyForBackup, NY: %s, weekend: %s, holiday: %s, forPriceFetch: %s, result: %s",
+                timeNY, weekend, holiday, periodForPriceFetch, result));
+
+        return result;
+    }
 }

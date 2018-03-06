@@ -95,7 +95,7 @@ public class FetchFinViz {
         try (AsyncHttpClient client = Dsl.asyncHttpClient(clientBuilder)) {
 
             List<String> knownSecurities = marketFinVizDAO.findFreshDataSymbols(LocalDate.now().atStartOfDay());
-            Result<Record> securities = securityDAO.findAllSecuritiesExcept(knownSecurities);
+            Result<Record> securities = securityDAO.findAllSecuritiesExcept(knownSecurities, false);
 
             securities.stream().forEach(security -> {
                 final String symbol = security.get(SECURITY.SYMBOL);

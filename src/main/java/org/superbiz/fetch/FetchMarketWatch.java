@@ -80,7 +80,7 @@ public class FetchMarketWatch {
                     .collect(Collectors.toList());
             LOGGER.info(String.format("MarketWatch data already read for %s: %s", currentDate, existingTodaySymbols));
 
-            Result<Record> securities = securityDAO.findAllSecuritiesExcept(existingTodaySymbols);
+            Result<Record> securities = securityDAO.findAllSecuritiesExcept(existingTodaySymbols, false);
             securities.stream().forEach(security -> {
                 String symbol = security.getValue(SECURITY.SYMBOL);
                 String url = String.format(URL_TEMPLATE, symbol.toLowerCase());

@@ -1,12 +1,12 @@
-- zabstraktnit PriceDAO
-- NetFetcherYahoo - zabstraktnit
-- skript SQL pro non_trading_days
-- hlidani uz ulozenych zaznamu pro fetchdata
 - initial data dump - securities
-- automaticka kopie dat pred ctenim novych dat
+- automaticka kopie heroku DB kazdy den
 - logging@heroku - jeden radek
-- com.zaxxer.hikari.HikariDataSource <init> MyHikariCP - Starting - vyhodit z logu
-- referencni integrita ?
+- package pro Scheduler
+- web
+  - reporting aktualizace cen
+  - reporting obsazenosti DB
+  - REST dotaz na cenu s parametrem symbol & interval
+
 -----------------------------------------------------------------
 - automaticke trideni classes na konec
 - cross validation

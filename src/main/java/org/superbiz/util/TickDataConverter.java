@@ -31,4 +31,18 @@ public class TickDataConverter {
             throw new RuntimeException(e);
         }
     }
+
+    public static List<TickData> byteaAsTickData(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        } else {
+            String json = GzipUtil.unzip(bytes);
+            return jsonAsTickData(json);
+        }
+    }
+
+    public static byte[] tickDataAsBytea(List<TickData> data) {
+        String json = tickDataAsJson(data);
+        return GzipUtil.zip(json);
+    }
 }
