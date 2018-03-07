@@ -25,6 +25,9 @@ import java.util.logging.Logger;
  * Adapted from https://github.com/deeplearning4j/dl4j-examples.git
  */
 public class XorExample {
+
+    public static final int HIDDEN_LAYER_NEURON_COUNT = 4;
+
     static {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
     }
@@ -52,7 +55,7 @@ public class XorExample {
         ListBuilder listBuilder = builder.list();
         DenseLayer.Builder hiddenLayerBuilder = new DenseLayer.Builder()
             .nIn(2)
-            .nOut(4)
+            .nOut(HIDDEN_LAYER_NEURON_COUNT)
             .activation(Activation.RELU)
             .weightInit(WeightInit.RELU);
             //.weightInit(WeightInit.DISTRIBUTION)
@@ -61,7 +64,7 @@ public class XorExample {
         listBuilder.layer(0, hiddenLayerBuilder.build());
 
         Builder outputLayerBuilder = new Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-            .nIn(4)
+            .nIn(HIDDEN_LAYER_NEURON_COUNT)
             .nOut(2)
             .activation(Activation.SOFTMAX)
             .weightInit(WeightInit.DISTRIBUTION)
@@ -94,5 +97,6 @@ public class XorExample {
         Evaluation eval = new Evaluation(2);
         eval.eval(ds.getLabels(), output);
         LOGGER.info(eval.stats());
+        LOGGER.info(String.format("%s", layers[0].params()));
     }
 }

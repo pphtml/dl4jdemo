@@ -1,6 +1,7 @@
 package org.superbiz.dao;
 
 import net.lamberto.junit.GuiceJUnitRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.superbiz.dto.PriceDTO;
@@ -23,6 +24,7 @@ public class Price1mDAOTest {
     Price1mDAO price1mDAO;
 
     @Test
+    @Ignore
     public void read() {
         final Optional<PriceDTO> priceDTO = price1mDAO.read("AMZN");
         assertFalse(priceDTO.isPresent());

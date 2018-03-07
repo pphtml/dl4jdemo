@@ -1,4 +1,4 @@
-package org.superbiz.web;
+package org.superbiz.scheduler;
 
 import org.superbiz.dao.Price1mDAO;
 import org.superbiz.dto.PriceDTO;

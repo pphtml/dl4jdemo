@@ -1,4 +1,4 @@
-package org.superbiz.web;
+package org.superbiz.scheduler;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

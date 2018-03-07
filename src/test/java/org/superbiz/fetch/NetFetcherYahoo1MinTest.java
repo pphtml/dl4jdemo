@@ -1,25 +1,27 @@
 package org.superbiz.fetch;
 
+import net.lamberto.junit.GuiceJUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.superbiz.fetch.model.Event;
-import org.superbiz.fetch.model.EventType;
+import org.junit.runner.RunWith;
 import org.superbiz.fetch.model.ParsingResult;
 import org.superbiz.fetch.model.TickData;
-import org.superbiz.util.TickDataConverter;
+import org.superbiz.guice.BasicModule;
 import org.superbiz.util.Utils;
 
-import java.math.BigDecimal;
+import javax.inject.Inject;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.superbiz.fetch.FetchData.pricesLinkedMapFromList;
 
+@RunWith(GuiceJUnitRunner.class)
+@GuiceJUnitRunner.GuiceModules(BasicModule.class)
 public class NetFetcherYahoo1MinTest {
-    private NetFetcherYahoo netFetcherYahoo = new NetFetcherYahoo();
+    @Inject
+    private NetFetcherYahoo netFetcherYahoo;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

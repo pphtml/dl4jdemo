@@ -1,6 +1,9 @@
 package org.superbiz.web;
 
 import org.superbiz.guice.BasicModule;
+import org.superbiz.scheduler.FinVizHandler;
+import org.superbiz.scheduler.MainScheduler;
+import org.superbiz.scheduler.PricesHandler;
 import org.superbiz.util.GlobalInit;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
@@ -10,10 +13,6 @@ import java.util.logging.Logger;
 
 public class DemoServer {
     static { GlobalInit.init(); }
-//    static {
-//        System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
-//        System.setProperty("org.jooq.no-logo", "true");
-//    }
 
     private static final Logger logger = Logger.getLogger(DemoServer.class.getName());
 

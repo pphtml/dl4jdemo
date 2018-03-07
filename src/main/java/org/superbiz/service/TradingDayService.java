@@ -53,7 +53,7 @@ public class TradingDayService {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         boolean weekend = dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
         boolean holiday = nonTradingDayDAO.isHoliday(date);
-        boolean periodForPriceFetch = time.getHour() >= 23;
+        boolean periodForPriceFetch = time.getHour() >= 17 && time.getHour() < 18;
 
         boolean result = !weekend && !holiday && periodForPriceFetch;
 
