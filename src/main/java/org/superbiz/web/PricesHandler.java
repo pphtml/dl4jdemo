@@ -1,4 +1,4 @@
-package org.superbiz.scheduler;
+package org.superbiz.web;
 
 import org.superbiz.dao.Price1mDAO;
 import org.superbiz.dto.PriceDTO;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class PricesHandler  implements Handler {
+public class PricesHandler implements Handler {
     @Inject
     Logger logger;
 

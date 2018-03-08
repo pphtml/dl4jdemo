@@ -1,5 +1,6 @@
 package org.superbiz.dl4j.ex02;
 
+import com.google.common.primitives.Ints;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -19,6 +20,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.superbiz.util.LoggingConfig;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -98,5 +101,10 @@ public class XorExample {
         eval.eval(ds.getLabels(), output);
         LOGGER.info(eval.stats());
         LOGGER.info(String.format("%s", layers[0].params()));
+
+        //INDArray test = Nd4j.create(new float[]{0,0, 0,0},new int[]{1, 2});
+        //final int[] result = net.predict(inputs);
+        final int[] result = net.predict(Nd4j.create(new float[]{1,1},new int[]{1, 2}));
+        System.out.println(Ints.asList(result));
     }
 }

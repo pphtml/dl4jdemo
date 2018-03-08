@@ -1,10 +1,6 @@
-public class Nd4jEx1_INDArrayBasics {
-    static { GlobalInit.init(); }
-    
+- prices - 1m & 5m
 - initial data dump - securities
 - automaticka kopie heroku DB kazdy den
-- logging@heroku - jeden radek
-- package pro Scheduler
 - modul pro testy bez databaze
 - pro ukladani dni staci 200 obchodnich dni
 - poresit unadjusted close
@@ -15,9 +11,8 @@ public class Nd4jEx1_INDArrayBasics {
   - reporting obsazenosti DB
   - REST dotaz na cenu s parametrem symbol & interval
   - REST dotaz na finviz data
-- omezit velikost knihoven v pomu
 - porovnat marketwatch
-
+- ukladat menovy pary ?
 -----------------------------------------------------------------
 - automaticke trideni classes na konec
 - cross validation
@@ -37,6 +32,8 @@ public class Nd4jEx1_INDArrayBasics {
 - https://github.com/bernii/NeuralNetwokPerceptronKohonen/blob/master/BackPropagation.java - matice
 - https://stackoverflow.com/questions/27280750/trouble-understanding-the-backpropagation-algorithm-in-neural-network
 - https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+
+- https://smalldata.tech/blog/2016/05/03/building-a-simple-neural-net-in-java
 
 t_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
 po 1. dni: 308507,258671,247757

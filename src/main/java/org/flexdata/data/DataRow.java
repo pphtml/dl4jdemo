@@ -1,6 +1,6 @@
 package org.flexdata.data;
 
-public class DataRow <T, U> {
+public class DataRow <T extends Number, U> {
     private final Features<T> features;
     private final Labels<U> labels;
 
@@ -9,7 +9,15 @@ public class DataRow <T, U> {
         this.labels = labels;
     }
 
-    public static <T, U> DataRow of(Features<T> features, Labels<U> labels) {
+    public Features<T> getFeatures() {
+        return features;
+    }
+
+    public Labels<U> getLabels() {
+        return labels;
+    }
+
+    public static <T extends Number, U> DataRow of(Features<T> features, Labels<U> labels) {
         return new DataRow(features, labels);
     }
 }

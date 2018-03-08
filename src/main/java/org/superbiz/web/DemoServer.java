@@ -1,9 +1,7 @@
 package org.superbiz.web;
 
 import org.superbiz.guice.BasicModule;
-import org.superbiz.scheduler.FinVizHandler;
 import org.superbiz.scheduler.MainScheduler;
-import org.superbiz.scheduler.PricesHandler;
 import org.superbiz.util.GlobalInit;
 import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
@@ -71,6 +69,7 @@ public class DemoServer {
                                 .get("datetime", ctx -> ctx.render(LocalDateTime.now().toString()))
                                 .path("finviz", FinVizHandler.class)
                                 .path("prices", PricesHandler.class)
+                                .path("data/:symbol", ctx -> ctx.render(String.format("Symbol: %s", ctx.getPathTokens().get("symbol"))))
 //                                .files(f -> f.dir("static"))
 //                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
                 ));

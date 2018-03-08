@@ -2,35 +2,34 @@ package org.flexdata.nn;
 
 import java.util.List;
 
-public class HiddenLayer implements Layer {
-    private final int neuronCount;
-    private final List<Double> params;
-
-    public HiddenLayer(int neuronCount, List<Double> params) {
+public class HiddenLayer extends AbstractDenseLayer implements Layer {
+    public HiddenLayer(int neuronCount, List<Double> initialParams) {
         this.neuronCount = neuronCount;
-        this.params = params;
+        this.initialParams = initialParams;
     }
 
-    public static class Builder {
-        private int neuronCount;
-        private List<Double> params;
-
+    public static class Builder extends AbstractDenseLayer.Builder {
         public static Builder create() {
             return new Builder();
         }
 
-        public Builder neuronCount(int neuronCount) {
+        public Builder withNeuronCount(int neuronCount) {
             this.neuronCount = neuronCount;
             return this;
         }
 
-        public Builder setParams(List<Double> params) {
-            this.params = params;
+        public HiddenLayer build() {
+            return new HiddenLayer(neuronCount, initialParams);
+        }
+
+        public <T extends Number> Builder setInitialParams(List<T> initialParams) {
+            super.setInitialParams(initialParams);
             return this;
         }
 
-        public HiddenLayer build() {
-            return new HiddenLayer(neuronCount, params);
+        public <T extends Number> Builder setInitialParamsList(T... list) {
+            super.setInitialParamsList(list);
+            return this;
         }
     }
 }

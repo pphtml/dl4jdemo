@@ -98,7 +98,7 @@ public class FetchData {
                 } catch (InterruptedException | ExecutionException | DataProcessingException | ParsingException e) {
                     LOGGER.log(Level.WARNING, String.format("Cannot read Trading Tick data for %s, reason: %s",
                             symbol, e.getMessage()), e);
-                    String errorMessageForDB = String.format("%s: %s", e.getClass(), e.getMessage());
+                    String errorMessageForDB = String.format("%s: %s%s", e.getClass(), e.getMessage(), url);
                     PriceDTO priceDTO = createPriceDTO()
                             .withSymbol(symbol)
                             .withLastUpdatedError(LocalDateTime.now())

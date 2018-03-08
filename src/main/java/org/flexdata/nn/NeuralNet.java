@@ -7,8 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNet {
-    public <T> Labels evaluate(Features<T> features) {
-        throw new UnsupportedOperationException();
+    private InputLayer inputLayer;
+    private List<HiddenLayer> hiddenLayers;
+    private OutputLayer outputLayer;
+
+//    public <T extends Number> Labels evaluate(Features<T> features) {
+    public List<Double> evaluate(Features features) {
+        //this.inputLayer.setParams(features.toParamsList());
+        List<Double> values = features.toParamsList();
+        for (HiddenLayer hiddenLayer : hiddenLayers) {
+            values = hiddenLayer.evaluate(values);
+        }
+        return outputLayer.evaluate(values);
     }
 
     public static class Builder {
@@ -37,6 +47,19 @@ public class NeuralNet {
 
         public NeuralNet build() {
             NeuralNet net = new NeuralNet();
+            net.inputLayer = inputLayer;
+            Layer previousLayer = inputLayer;
+            for (HiddenLayer hiddenLayer : hiddenLayers) {
+                hiddenLayer.setPreviousLayer(previousLayer);
+                previousLayer = hiddenLayer;
+                //hiddenLayer.setInputNeuronCount(previousLayer.getNeuronCount());
+                hiddenLayer.buildNeurons();
+            }
+            net.hiddenLayers = hiddenLayers;
+            outputLayer.setPreviousLayer(previousLayer);
+            outputLayer.buildNeurons();
+            net.outputLayer = outputLayer;
+
             return net;
         }
     }

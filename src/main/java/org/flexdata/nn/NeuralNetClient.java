@@ -23,6 +23,13 @@ import org.flexdata.data.Features;
 import org.flexdata.data.Labels;
 
 import java.util.Arrays;
+import java.util.List;
+
+// <dependency>
+//    <groupId>com.github.bentorfs</groupId>
+//    <artifactId>ai-algorithms</artifactId>
+//    <version>0.2.0</version>
+//</dependency>
 
 public class NeuralNetClient {
     public static void main(String[] args) {
@@ -34,13 +41,15 @@ public class NeuralNetClient {
         );
 
         NeuralNet net = NeuralNet.Builder.create()
-                .withInputLayer(Layer.fromDataset(xorDataSet))
+                .withInputLayer(Layer.fromDataSet(xorDataSet))
                 .addHiddenLayer(HiddenLayer.Builder.create()
-                        .neuronCount(4)
-                        .setParams(Arrays.asList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00))
+                        .withNeuronCount(4)
+                        .setInitialParamsList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00)
                         .build()
                 )
                 .withOutputLayer(OutputLayer.Builder.create()
+                        .withNeuronCount(2)
+                        .setInitialParamsList(0.53,  3.05,  -2.28,  -1.22,  0.36,  -1.98,  3.21,  2.47,  2.44,  -2.44)
 //                    .nOut(2)
 //                    .activation(Activation.SOFTMAX)
 //                    .weightInit(WeightInit.DISTRIBUTION)
@@ -49,7 +58,11 @@ public class NeuralNetClient {
                 )
                 .build();
 
-        Labels result = net.evaluate(Features.from(0.0, 1.0));
+        System.out.println(net.evaluate(Features.from(0.0, 0.0)));
+        System.out.println(net.evaluate(Features.from(0.0, 1.0)));
+        System.out.println(net.evaluate(Features.from(1.0, 0.0)));
+        System.out.println(net.evaluate(Features.from(1.0, 1.0)));
+        //System.out.println(result);
 
 //        INDArray inputs = Nd4j.create(new float[]{0,0, 0,1, 1,0, 1,1},new int[]{4, 2});
 //        INDArray labels = Nd4j.create(new float[]{1,0, 0,1, 0,1, 1,0},new int[]{4, 2});

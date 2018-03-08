@@ -1,4 +1,4 @@
-package org.superbiz.scheduler;
+package org.superbiz.web;
 
 import org.superbiz.dao.MarketFinVizDAO;
 import org.superbiz.dto.MarketFinVizDTO;
