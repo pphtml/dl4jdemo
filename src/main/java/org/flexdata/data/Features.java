@@ -27,4 +27,8 @@ public class Features<S extends Number> {
                 .map(value -> value.doubleValue())
                 .collect(Collectors.toList());
     }
+
+    public double[] toParamsArrayOfDouble() {
+        return Doubles.toArray(this.toParamsList());
+    }
 }

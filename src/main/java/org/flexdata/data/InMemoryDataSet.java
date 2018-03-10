@@ -1,6 +1,10 @@
 package org.flexdata.data;
 
-public class InMemoryDataSet<T extends Number, U> implements DataSet<T, U> {
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+
+public class InMemoryDataSet<T extends Number, U extends Number> implements DataSet<T, U>, Iterable<DataRow> {
     private final DataRow<T, U>[] records;
 
     InMemoryDataSet(DataRow<T, U>[] records) {
@@ -14,5 +18,32 @@ public class InMemoryDataSet<T extends Number, U> implements DataSet<T, U> {
         } else {
             return this.records[0];
         }
+    }
+
+    @Override
+    public Iterator<DataRow> iterator() {
+        return new Iterator<DataRow>() {
+            int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < records.length;
+            }
+
+            @Override
+            public DataRow next() {
+                return records[index++];
+            }
+        };
+    }
+
+    @Override
+    public void forEach(Consumer<? super DataRow> action) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Spliterator<DataRow> spliterator() {
+        throw new UnsupportedOperationException();
     }
 }

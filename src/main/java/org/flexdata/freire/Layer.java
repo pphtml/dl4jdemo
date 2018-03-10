@@ -11,15 +11,15 @@ public class Layer {
     private float[] input;
     private float[] output;
     private float[] weights;
-    private float[] dWeights;
-    private Random random;
+    //private float[] dWeights;
+    private static final Random random = new Random(42);
 
     public Layer(int inputSize, int outputSize) {
         this.output = new float[outputSize];
         this.input = new float[inputSize+1]; // + 1 for bias node
         this.weights = new float[(inputSize+1) * outputSize];
-        this.dWeights = new float[weights.length];
-        this.random = new Random();
+        //this.dWeights = new float[weights.length];
+        //this.random = new Random();
         
         initWeights();
     }
@@ -55,8 +55,10 @@ public class Layer {
                 int weightIndex = offset + j;
                 nextError[j] += weights[weightIndex] * delta;
                 float dw = input[j] * delta * learningRate;
-                weights[weightIndex] += dWeights[weightIndex] * momentum + dw;
-                dWeights[weightIndex] = dw;
+                //weights[weightIndex] += dw * momentum;
+                weights[weightIndex] += dw;
+//                weights[weightIndex] += /*dWeights[weightIndex]*/ dw * momentum + dw;
+                //dWeights[weightIndex] = dw;
             }
             offset += input.length;
         }

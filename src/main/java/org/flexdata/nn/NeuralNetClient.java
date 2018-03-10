@@ -21,6 +21,7 @@ import org.flexdata.data.DataRow;
 import org.flexdata.data.DataSet;
 import org.flexdata.data.Features;
 import org.flexdata.data.Labels;
+import org.flexdata.nn.activation.Sigmoid;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,23 +34,31 @@ import java.util.List;
 
 public class NeuralNetClient {
     public static void main(String[] args) {
+//        DataSet xorDataSet = DataSet.ofList(
+//                DataRow.of(Features.from(0.0, 0.0), Labels.of(1.0, 0.0)),
+//                DataRow.of(Features.from(0.0, 1.0), Labels.of(0.0, 1.0)),
+//                DataRow.of(Features.from(1.0, 0.0), Labels.of(0.0, 1.0)),
+//                DataRow.of(Features.from(1.0, 1.0), Labels.of(1.0, 0.0))
+//        );
         DataSet xorDataSet = DataSet.ofList(
-                DataRow.of(Features.from(0.0, 0.0), Labels.of(1.0, 0.0)),
-                DataRow.of(Features.from(0.0, 1.0), Labels.of(0.0, 1.0)),
-                DataRow.of(Features.from(1.0, 0.0), Labels.of(0.0, 1.0)),
-                DataRow.of(Features.from(1.0, 1.0), Labels.of(1.0, 0.0))
+                DataRow.of(Features.from(0.0, 0.0), Labels.of(0.0)),
+                DataRow.of(Features.from(0.0, 1.0), Labels.of(1.0)),
+                DataRow.of(Features.from(1.0, 0.0), Labels.of(1.0)),
+                DataRow.of(Features.from(1.0, 1.0), Labels.of(0.0))
         );
 
         NeuralNet net = NeuralNet.Builder.create()
+                .withRandomSeed(42)
+                .withActivationFunction(Sigmoid.class)
                 .withInputLayer(Layer.fromDataSet(xorDataSet))
                 .addHiddenLayer(HiddenLayer.Builder.create()
-                        .withNeuronCount(4)
-                        .setInitialParamsList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00)
+                        .withNeuronCount(3)
+                        //.setInitialParamsList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00)
                         .build()
                 )
                 .withOutputLayer(OutputLayer.Builder.create()
-                        .withNeuronCount(2)
-                        .setInitialParamsList(0.53,  3.05,  -2.28,  -1.22,  0.36,  -1.98,  3.21,  2.47,  2.44,  -2.44)
+                        .withNeuronCount(1)
+                        //.setInitialParamsList(0.53,  3.05,  -2.28,  -1.22,  0.36,  -1.98,  3.21,  2.47,  2.44,  -2.44)
 //                    .nOut(2)
 //                    .activation(Activation.SOFTMAX)
 //                    .weightInit(WeightInit.DISTRIBUTION)
@@ -57,6 +66,8 @@ public class NeuralNetClient {
                                 .build()
                 )
                 .build();
+
+        net.fit();
 
         System.out.println(net.evaluate(Features.from(0.0, 0.0)));
         System.out.println(net.evaluate(Features.from(0.0, 1.0)));

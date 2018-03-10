@@ -1,7 +1,6 @@
 package org.flexdata.nn;
 
 import org.flexdata.data.DataSet;
-import org.flexdata.data.Labels;
 
 import java.util.List;
 
@@ -14,5 +13,5 @@ public interface Layer {
 
     int getNeuronCount();
 
-    List<Double> evaluate(List<Double> values);
+    double[] evaluate(double[] values);
 }

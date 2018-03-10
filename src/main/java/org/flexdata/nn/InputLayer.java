@@ -21,7 +21,7 @@ public class InputLayer implements Layer {
     }
 
     @Override
-    public List<Double> evaluate(List<Double> values) {
+    public double[] evaluate(double[] values) {
         throw new UnsupportedOperationException("Input layer cannot evaluate.");
     }
 
@@ -33,5 +33,9 @@ public class InputLayer implements Layer {
 
     public void setParams(List<Double> params) {
         this.params = params;
+    }
+
+    public DataSet getDataSet() {
+        return dataSet;
     }
 }

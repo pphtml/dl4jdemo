@@ -16,7 +16,7 @@ public class KohoMain {
         //double[][] arrx = {{0, 0.05, 0.05}, {0, 0, 0.25}, {0.5, 0, 0.5}, {0.6, 0.4, 0}};
 
         double[][] arrx = {{0,0}, {0,1}, {1,0}, {1,1}};
-        INDArray labels = Nd4j.create(new float[]{1,0, 0,1, 0,1, 1,0},new int[]{4, 2});
+        //INDArray labels = Nd4j.create(new float[]{1,0, 0,1, 0,1, 1,0},new int[]{4, 2});
 
         Matrix x = new Matrix(arrx);
         System.out.println("X = \n" + x.print());
