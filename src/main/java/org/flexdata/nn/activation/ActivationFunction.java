@@ -1,7 +1,9 @@
 package org.flexdata.nn.activation;
 
-public interface ActivationFunction {
-    double call(double value);
+import org.nd4j.linalg.api.ndarray.INDArray;
 
-    double derivation(double value);
+public interface ActivationFunction {
+    INDArray call(INDArray values);
+
+    INDArray derivation(INDArray values);
 }

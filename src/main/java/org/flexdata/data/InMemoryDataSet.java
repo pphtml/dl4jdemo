@@ -1,11 +1,15 @@
 package org.flexdata.data;
 
+import org.flexdata.util.Utils;
+import org.nd4j.linalg.api.ndarray.INDArray;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class InMemoryDataSet<T extends Number, U extends Number> implements DataSet<T, U>, Iterable<DataRow> {
     private final DataRow<T, U>[] records;
+    private float[][] labelsVector;
 
     InMemoryDataSet(DataRow<T, U>[] records) {
         this.records = records;
@@ -18,6 +22,24 @@ public class InMemoryDataSet<T extends Number, U extends Number> implements Data
         } else {
             return this.records[0];
         }
+    }
+
+    private float[][] getFeaturesVector() {
+        float result[][] = new float[records.length][];
+        for (int index = 0; index < records.length; index++) {
+            result[index] = records[index].getFeaturesAsFloats();
+        }
+        return result;
+    }
+
+    @Override
+    public INDArray getFeatures() {
+        return Utils.asINDArray(this.getFeaturesVector());
+    }
+
+    @Override
+    public INDArray getLabels() {
+        return Utils.asINDArray(this.getLabelsVector());
     }
 
     @Override
@@ -45,5 +67,13 @@ public class InMemoryDataSet<T extends Number, U extends Number> implements Data
     @Override
     public Spliterator<DataRow> spliterator() {
         throw new UnsupportedOperationException();
+    }
+
+    public float[][] getLabelsVector() {
+        float result[][] = new float[records.length][];
+        for (int index = 0; index < records.length; index++) {
+            result[index] = records[index].getLabelsAsFloats();
+        }
+        return result;
     }
 }

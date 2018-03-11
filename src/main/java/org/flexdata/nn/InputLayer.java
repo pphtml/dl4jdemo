@@ -20,11 +20,6 @@ public class InputLayer implements Layer {
         return headDataRow.getFeatures().count();
     }
 
-    @Override
-    public double[] evaluate(double[] values) {
-        throw new UnsupportedOperationException("Input layer cannot evaluate.");
-    }
-
     static InputLayer fromDataSet(DataSet dataSet) {
         InputLayer inputLayer = new InputLayer();
         inputLayer.dataSet = dataSet;

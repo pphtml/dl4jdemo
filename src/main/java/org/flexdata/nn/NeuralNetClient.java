@@ -22,6 +22,8 @@ import org.flexdata.data.DataSet;
 import org.flexdata.data.Features;
 import org.flexdata.data.Labels;
 import org.flexdata.nn.activation.Sigmoid;
+import org.flexdata.nn.activation.Softmax;
+import org.superbiz.util.LoggingConfig;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +35,10 @@ import java.util.List;
 //</dependency>
 
 public class NeuralNetClient {
+    static {
+        System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
+    }
+
     public static void main(String[] args) {
 //        DataSet xorDataSet = DataSet.ofList(
 //                DataRow.of(Features.from(0.0, 0.0), Labels.of(1.0, 0.0)),
@@ -49,15 +55,16 @@ public class NeuralNetClient {
 
         NeuralNet net = NeuralNet.Builder.create()
                 .withRandomSeed(42)
-                .withActivationFunction(Sigmoid.class)
                 .withInputLayer(Layer.fromDataSet(xorDataSet))
                 .addHiddenLayer(HiddenLayer.Builder.create()
-                        .withNeuronCount(3)
+                        .withNeuronCount(4)
+                        .withActivationFunction(Sigmoid.class)
                         //.setInitialParamsList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00)
                         .build()
                 )
                 .withOutputLayer(OutputLayer.Builder.create()
-                        .withNeuronCount(1)
+                        .withNeuronCount(2)
+                        .withActivationFunction(Softmax.class)
                         //.setInitialParamsList(0.53,  3.05,  -2.28,  -1.22,  0.36,  -1.98,  3.21,  2.47,  2.44,  -2.44)
 //                    .nOut(2)
 //                    .activation(Activation.SOFTMAX)
@@ -69,10 +76,10 @@ public class NeuralNetClient {
 
         net.fit();
 
-        System.out.println(net.evaluate(Features.from(0.0, 0.0)));
-        System.out.println(net.evaluate(Features.from(0.0, 1.0)));
-        System.out.println(net.evaluate(Features.from(1.0, 0.0)));
-        System.out.println(net.evaluate(Features.from(1.0, 1.0)));
+//        System.out.println(net.evaluate(Features.from(0.0, 0.0)));
+//        System.out.println(net.evaluate(Features.from(0.0, 1.0)));
+//        System.out.println(net.evaluate(Features.from(1.0, 0.0)));
+//        System.out.println(net.evaluate(Features.from(1.0, 1.0)));
         //System.out.println(result);
 
 //        INDArray inputs = Nd4j.create(new float[]{0,0, 0,1, 1,0, 1,1},new int[]{4, 2});

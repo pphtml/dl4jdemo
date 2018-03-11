@@ -27,4 +27,12 @@ public class Labels<S extends Number> {
     public double[] toArrayOfDouble() {
         return Doubles.toArray(this.toList());
     }
+
+    public float[] asFloats() {
+        float[] result = new float[labels.length];
+        for (int index = 0; index < result.length; index++) {
+            result[index] = labels[index].floatValue();
+        }
+        return result;
+    }
 }

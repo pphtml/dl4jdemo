@@ -30,7 +30,7 @@ public class Titanic {
         System.setProperty("java.util.logging.config.class", LoggingConfig.class.getName());
     }
 
-    private static final Logger LOGGER = Logger.getLogger(HelloDL4J.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Titanic.class.getName());
 
     private static final int FEATURES_COUNT = 1;
     private static final int CLASSES_COUNT = 2;

@@ -12,6 +12,4 @@ public interface Layer {
     void setPreviousLayer(Layer previousLayer);
 
     int getNeuronCount();
-
-    double[] evaluate(double[] values);
 }

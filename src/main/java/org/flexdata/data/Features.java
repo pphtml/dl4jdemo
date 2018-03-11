@@ -31,4 +31,12 @@ public class Features<S extends Number> {
     public double[] toParamsArrayOfDouble() {
         return Doubles.toArray(this.toParamsList());
     }
+
+    public float[] asFloats() {
+        float[] result = new float[features.length];
+        for (int index = 0; index < result.length; index++) {
+            result[index] = features[index].floatValue();
+        }
+        return result;
+    }
 }

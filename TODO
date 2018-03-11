@@ -14,18 +14,21 @@
 - porovnat marketwatch
 - ukladat menovy pary ?
 -----------------------------------------------------------------
-- for (Object d : dataSet)
+BaseLayer:301 - Input validation
 
-- automaticke trideni classes na konec
-- cross validation
+http://neuralnetworksanddeeplearning.com/chap1.html
+
+
 
 - titanic
-  - SVC varianta, GradientBoostingClassifier, RandomForestClassifier
 - xor priklad - XorExample
+- mnist
 - rekonstrukce funkce - RegressionMathFunctions
 - house prices
 - MLP classifier linear / moon / saturn - MLPClassifierLinear
 - rnn - basic example - BasicRNNExample
+- automaticke trideni classes na konec
+
 - rnn - UCISequenceClassificationExample
 - https://dzone.com/articles/java-art-generation-with-neural-style-transfer
 - https://github.com/josej30/Neural-Network
@@ -37,10 +40,10 @@
 
 - https://smalldata.tech/blog/2016/05/03/building-a-simple-neural-net-in-java
 
-t_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
+select sum(octet_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
 po 1. dni: 308507,258671,247757
            349822,258671,249544
-
+na konci tydne: 450632,259499,253467
 
 
 JDBC_DATABASE_URL=$JDBC_DE mvn install
