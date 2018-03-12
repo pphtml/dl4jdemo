@@ -21,12 +21,12 @@ import org.flexdata.data.DataRow;
 import org.flexdata.data.DataSet;
 import org.flexdata.data.Features;
 import org.flexdata.data.Labels;
-import org.flexdata.nn.activation.Sigmoid;
+import org.flexdata.nn.activation.Relu;
 import org.flexdata.nn.activation.Softmax;
+import org.flexdata.nn.initialization.SequenceDistribution;
+import org.flexdata.nn.initialization.UniformDistribution;
+import org.flexdata.nn.initialization.WeightInit;
 import org.superbiz.util.LoggingConfig;
-
-import java.util.Arrays;
-import java.util.List;
 
 // <dependency>
 //    <groupId>com.github.bentorfs</groupId>
@@ -40,37 +40,36 @@ public class NeuralNetClient {
     }
 
     public static void main(String[] args) {
-//        DataSet xorDataSet = DataSet.ofList(
-//                DataRow.of(Features.from(0.0, 0.0), Labels.of(1.0, 0.0)),
-//                DataRow.of(Features.from(0.0, 1.0), Labels.of(0.0, 1.0)),
-//                DataRow.of(Features.from(1.0, 0.0), Labels.of(0.0, 1.0)),
-//                DataRow.of(Features.from(1.0, 1.0), Labels.of(1.0, 0.0))
-//        );
         DataSet xorDataSet = DataSet.ofList(
-                DataRow.of(Features.from(0.0, 0.0), Labels.of(0.0)),
-                DataRow.of(Features.from(0.0, 1.0), Labels.of(1.0)),
-                DataRow.of(Features.from(1.0, 0.0), Labels.of(1.0)),
-                DataRow.of(Features.from(1.0, 1.0), Labels.of(0.0))
+                DataRow.of(Features.from(0.0, 0.0), Labels.of(1.0, 0.0)),
+                DataRow.of(Features.from(0.0, 1.0), Labels.of(0.0, 1.0)),
+                DataRow.of(Features.from(1.0, 0.0), Labels.of(0.0, 1.0)),
+                DataRow.of(Features.from(1.0, 1.0), Labels.of(1.0, 0.0))
         );
+//        DataSet xorDataSet = DataSet.ofList(
+//                DataRow.of(Features.from(0.0, 0.0), Labels.of(0.0)),
+//                DataRow.of(Features.from(0.0, 1.0), Labels.of(1.0)),
+//                DataRow.of(Features.from(1.0, 0.0), Labels.of(1.0)),
+//                DataRow.of(Features.from(1.0, 1.0), Labels.of(0.0))
+//        );
 
         NeuralNet net = NeuralNet.Builder.create()
                 .withRandomSeed(42)
                 .withInputLayer(Layer.fromDataSet(xorDataSet))
                 .addHiddenLayer(HiddenLayer.Builder.create()
                         .withNeuronCount(4)
-                        .withActivationFunction(Sigmoid.class)
+                        .withActivationFunction(Relu.class)
+                        .withWeightInitialization(WeightInit.RELU)
                         //.setInitialParamsList(0.02, -2.49, 1.65, 2.80, -2.98, 2.98, 2.99, 0.35, -0.03, -1.65, -0.00, -0.00)
                         .build()
                 )
                 .withOutputLayer(OutputLayer.Builder.create()
                         .withNeuronCount(2)
                         .withActivationFunction(Softmax.class)
-                        //.setInitialParamsList(0.53,  3.05,  -2.28,  -1.22,  0.36,  -1.98,  3.21,  2.47,  2.44,  -2.44)
-//                    .nOut(2)
-//                    .activation(Activation.SOFTMAX)
-//                    .weightInit(WeightInit.DISTRIBUTION)
-//                    .dist(new UniformDistribution(0, 1))
-                                .build()
+                        //.withWeightInitialization(WeightInit.DISTRIBUTION, new UniformDistribution(0, 1))
+                        .withWeightInitialization(WeightInit.DISTRIBUTION, SequenceDistribution.of(0.53196114,
+                                0.35115042, 0.8987584, 0.17555624, 0.1691667, 0.7674509, 0.6325145, 0.6179164))
+                        .build()
                 )
                 .build();
 

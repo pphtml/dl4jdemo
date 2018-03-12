@@ -2,6 +2,7 @@ package org.flexdata.nn;
 
 import org.flexdata.data.DataRow;
 import org.flexdata.data.DataSet;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.List;
 
@@ -32,5 +33,11 @@ public class InputLayer implements Layer {
 
     public DataSet getDataSet() {
         return dataSet;
+    }
+
+    @Override
+    public INDArray getOutput() {
+        // TODO udelat caching
+        return dataSet.getFeatures();
     }
 }

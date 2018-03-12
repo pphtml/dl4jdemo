@@ -1,13 +1,9 @@
 package org.flexdata.nn;
 
-import com.google.common.primitives.Doubles;
-import org.flexdata.data.DataRow;
 import org.flexdata.data.DataSet;
-import org.flexdata.data.Features;
 import org.flexdata.nn.activation.ActivationFunction;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +45,34 @@ public class NeuralNet {
 
         for (int iteration = 0; iteration < 1; iteration++) {
             INDArray result = evaluate(features);
-            INDArray errors = labels.sub(result);
-            INDArray e2 = errors.mul(errors);
-            INDArray softmax = Transforms.softmax(e2);
-            System.out.println(softmax);
+            INDArray outputGradients = result.subi(labels);
+
+//            //Nd4j.gemm(input, delta, weightGradView, true, false, 1.0, 0.0); //Equivalent to:  weightGradView.assign(input.transpose().mmul(delta));
+//            delta.sum(biasGradView, 0); //biasGradView is initialized/zeroed first in sum op
+//            weightGradView = [[0.02,  -0.02],
+// [0.19,  -0.19],
+// [0.36,  -0.36],
+// [0.42,  -0.42]]
+//            biasGradView = [0.24,  -0.24]
+
+            AbstractDenseLayer previousLayer = denseLayers.get(denseLayers.size() - 2);
+            AbstractDenseLayer currentLayer = denseLayers.get(denseLayers.size() - 1);
+
+            INDArray input = previousLayer.getOutput();
+            INDArray weightGradView = input.transpose().mmul(outputGradients);
+            INDArray biasGradView = outputGradients.sum(new int[]{0});
+
+            INDArray epsilonNext = currentLayer.getW().mmul(outputGradients.transpose()).transpose();
+
+
+//            INDArray epsilonNext = params.get(DefaultParamInitializer.WEIGHT_KEY).mmul(delta.transpose()).transpose();
+//            epsilonNext = [[-0.09,  -0.36,  0.30,  -0.01],
+// [0.10,  0.40,  -0.33,  0.01],
+// [0.09,  0.38,  -0.31,  0.01],
+// [-0.06,  -0.24,  0.20,  -0.00]]
+
+
+            System.out.println(result);
 
 
 //            for (Object d : dataSet) {
@@ -105,7 +125,7 @@ public class NeuralNet {
             if (seed != null) {
                 Nd4j.getRandom().setSeed(seed);
             }
-            //Random random = this.seed != null ? new Random(this.seed) : new Random();
+            Random random = this.seed != null ? new Random(this.seed) : new Random();
             net.inputLayer = inputLayer;
 //            for (HiddenLayer hiddenLayer : hiddenLayers) {
 //            }
@@ -122,7 +142,7 @@ public class NeuralNet {
                 denseLayer.setPreviousLayer(previousLayer);
                 previousLayer = denseLayer;
                 //hiddenLayer.setInputNeuronCount(previousLayer.getNeuronCount());
-                //denseLayer.setRandom(random);
+                denseLayer.setRandom(random);
                 denseLayer.buildNeurons();
             }
             //net.outputLayer = outputLayer;

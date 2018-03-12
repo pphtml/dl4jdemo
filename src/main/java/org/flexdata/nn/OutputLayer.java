@@ -1,6 +1,9 @@
 package org.flexdata.nn;
 
 import org.flexdata.nn.activation.ActivationFunction;
+import org.flexdata.nn.initialization.Distribution;
+import org.flexdata.nn.initialization.UniformDistribution;
+import org.flexdata.nn.initialization.WeightInit;
 
 import java.util.List;
 
@@ -15,6 +18,8 @@ public class OutputLayer extends AbstractDenseLayer implements Layer {
             outputLayer.neuronCount = neuronCount;
             outputLayer.initialParams = initialParams;
             outputLayer.activationFunction = instantiateActivationFunction(activationFunction);
+            outputLayer.weightInitialization = weightInitialization;
+            outputLayer.distribution = distribution;
             return outputLayer;
         }
 
@@ -39,5 +44,15 @@ public class OutputLayer extends AbstractDenseLayer implements Layer {
             return this;
         }
 
+        public Builder withWeightInitialization(WeightInit weightInitialization) {
+            this.weightInitialization = weightInitialization;
+            return this;
+        }
+
+        public Builder withWeightInitialization(WeightInit weightInitialization, Distribution distribution) {
+            this.weightInitialization = weightInitialization;
+            this.distribution = distribution;
+            return this;
+        }
     }
 }

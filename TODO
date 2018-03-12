@@ -48,3 +48,12 @@ na konci tydne: 450632,259499,253467
 
 JDBC_DATABASE_URL=$JDBC_DE mvn install
 wixi
+
+
+
+
+org.deeplearning4j.nn.multilayer.MultiLayerNetwork.calcBackpropGradients  1353
+org.deeplearning4j.optimize.solvers.BaseOptimizer.updateGradientAccordingToParams  334
+org.deeplearning4j.optimize.solvers.BaseOptimizer.gradientAndScore 188
+org.deeplearning4j.nn.updater.UpdaterBlock.postApply
+org.deeplearning4j.optimize.solvers.StochasticGradientDescent.optimize 79 - mozna az tady

@@ -1,8 +1,8 @@
 package org.flexdata.nn;
 
-import com.google.common.primitives.Doubles;
 import org.flexdata.nn.activation.ActivationFunction;
-import org.flexdata.nn.activation.Sigmoid;
+import org.flexdata.nn.initialization.Distribution;
+import org.flexdata.nn.initialization.WeightInit;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -21,8 +21,11 @@ public abstract class AbstractDenseLayer implements Layer {
 //    double[] output;
     Layer previousLayer;
     int nIn;
-//    private Random random;
+    Random random;
     ActivationFunction activationFunction;
+    WeightInit weightInitialization;
+    Distribution distribution;
+    INDArray output;
 //    private int inputNeuronCount;
 
     @Override
@@ -54,8 +57,9 @@ public abstract class AbstractDenseLayer implements Layer {
 //
 //            Nd4j.getExecutioner().execAndReturn(new Sigmoid(in));
 
-        INDArray ret = input.mmul(W).addiRowVector(b);
-        ret = activationFunction.call(ret);
+        INDArray result = input.mmul(W).addiRowVector(b);
+        result = activationFunction.call(result);
+        this.output = result;
 
 //        output = new double[this.neuronCount];
 //        input = new double[values.length + 1];
@@ -71,7 +75,7 @@ public abstract class AbstractDenseLayer implements Layer {
 //            offset += input.length;
 //        }
 //        return output;
-        return ret;
+        return result;
     }
 
 
@@ -98,7 +102,11 @@ public abstract class AbstractDenseLayer implements Layer {
     private void initWeights() {
         final int nOut = this.getNeuronCount();
         //final int parameterCount = nOut * (nIn + 1);
-        W = Nd4j.randn(new int[]{nIn, nOut});
+        //W = Nd4j.randn(new int[]{nIn, nOut});
+
+
+        W = weightInitialization.execute(new int[]{nIn, nOut}, nIn, distribution, random);
+        //W = Nd4j.randn('f', new int[]{nIn, nOut}).muli(FastMath.sqrt(2.0 / nIn));
         b = Nd4j.zeros(new int[]{nOut});
 //
 //        this.params = new double[parameterCount];
@@ -125,9 +133,9 @@ public abstract class AbstractDenseLayer implements Layer {
         }
     }
 
-//    public void setRandom(Random random) {
-//        this.random = random;
-//    }
+    public void setRandom(Random random) {
+        this.random = random;
+    }
 
     public void setDefaultActivationFunction(ActivationFunction defaultActivationFunction) {
         if (this.activationFunction == null) {
@@ -179,6 +187,8 @@ public abstract class AbstractDenseLayer implements Layer {
         int neuronCount;
         List<Double> initialParams;
         Class<? extends ActivationFunction> activationFunction;
+        WeightInit weightInitialization;
+        Distribution distribution;
 
         public <T extends Number> Builder setInitialParams(List<T> initialParams) {
             this.initialParams = convertToDoubles(initialParams);
@@ -209,5 +219,26 @@ public abstract class AbstractDenseLayer implements Layer {
             throw new NeuralNetBuildException(e);
         }
 
+    }
+
+    @Override
+    public INDArray getOutput() {
+        return output;
+    }
+
+    public INDArray getW() {
+        return W;
+    }
+
+    public void setW(INDArray w) {
+        W = w;
+    }
+
+    public INDArray getB() {
+        return b;
+    }
+
+    public void setB(INDArray b) {
+        this.b = b;
     }
 }
