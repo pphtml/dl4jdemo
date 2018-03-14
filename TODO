@@ -1,4 +1,5 @@
 - prices - 1m & 5m
+- "trigger" pro manualni dump cen i finviz
 - initial data dump - securities
 - automaticka kopie heroku DB kazdy den
 - modul pro testy bez databaze
@@ -14,11 +15,17 @@
 - porovnat marketwatch
 - ukladat menovy pary ?
 -----------------------------------------------------------------
-BaseLayer:301 - Input validation
+https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto
+https://www.youtube.com/watch?v=j3MZ0brQ0QE
+https://github.com/FezVrasta/ark-server-tools/wiki/Install-of-required-versions-of-glibc-and-gcc-on-RHEL-CentOS
+https://github.com/loretoparisi/tensorflow-java
+https://www.chilkatsoft.com/java-loadLibrary-Linux.asp
+https://stackoverflow.com/questions/16227045/how-to-add-so-file-to-the-java-library-path-in-linux
+https://www.nvidia.com/en-us/data-center/gpu-accelerated-applications/tensorflow/
+https://www.geforce.com/hardware/desktop-gpus/geforce-605-oem/specifications
 
-http://neuralnetworksanddeeplearning.com/chap1.html
-
-
+- http://playground.tensorflow.org
+- https://www.datacamp.com/community/tutorials/tensorflow-tutorial
 
 - titanic
 - xor priklad - XorExample
