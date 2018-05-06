@@ -47,6 +47,8 @@ https://www.geforce.com/hardware/desktop-gpus/geforce-605-oem/specifications
 
 - https://smalldata.tech/blog/2016/05/03/building-a-simple-neural-net-in-java
 
+select sum(octet_length(p.data)) from price_1m p;
+select sum(octet_length(p.data)) from price_5m p;
 select sum(octet_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
 po 1. dni: 308507,258671,247757
            349822,258671,249544

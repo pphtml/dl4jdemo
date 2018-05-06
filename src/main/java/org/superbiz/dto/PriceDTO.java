@@ -1,11 +1,15 @@
 package org.superbiz.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.superbiz.fetch.model.TickData;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class PriceDTO {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private String symbol;
     private String lastError;
     private LocalDateTime lastUpdated;
@@ -100,6 +104,14 @@ public class PriceDTO {
             priceDTO.setData(data);
             priceDTO.setLastUpdatedError(lastUpdatedError);
             return priceDTO;
+        }
+    }
+
+    public String asJson() {
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
