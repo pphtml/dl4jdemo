@@ -17,13 +17,14 @@ public class PricesDownloadHandler implements Handler {
     Price1mDAO price1mDAO;
 
     @Override
-    public void handle(Context ctx) throws Exception {
+    public void handle(Context ctx) {
         String symbol = ctx.getRequest().getQueryParams().get("s");
         Optional<PriceDTO> data = price1mDAO.read(symbol);
         if (data.isPresent()) {
             ctx.getResponse().send(data.get().asJson());
         } else {
-            // TODO 404
+            ctx.getResponse().status(404);
+            ctx.getResponse().send("not found");
         }
     }
 }

@@ -1,7 +1,12 @@
+- download 1d
+- list securit
+- data handler 1m/5m/1d
+- automaticka kopie heroku DB kazdy den
+
+
 - prices - 1m & 5m
 - "trigger" pro manualni dump cen i finviz
 - initial data dump - securities
-- automaticka kopie heroku DB kazdy den
 - modul pro testy bez databaze
 - pro ukladani dni staci 200 obchodnich dni
 - poresit unadjusted close

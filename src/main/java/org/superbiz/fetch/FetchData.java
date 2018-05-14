@@ -53,7 +53,8 @@ public class FetchData {
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
-        fetchData.fetchAllIntervals();
+        //fetchData.fetchAllIntervals();
+        fetchData.fetchAll(fetchData.price1dDAO, "1d", 3650);
         //PriceDTO price = fetchData.readFromDB("AMZN");
     }
 
