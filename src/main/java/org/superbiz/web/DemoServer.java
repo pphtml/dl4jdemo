@@ -30,6 +30,7 @@ public class DemoServer {
                         .bind(FinVizHandler.class)
                         .bind(PricesHandler.class)
                         .bind(PricesDownloadHandler.class)
+                        .bind(PriceDataHandler.class)
                         .bind(TestHandler.class)
 //                        .moduleConfig(ApplicationModule.class, bindings.getServerConfig().get("/user", ApplicationModule.Config.class))
 //                        .moduleConfig(HikariModule.class, getHikariConfig())
@@ -73,10 +74,7 @@ public class DemoServer {
                                 .path("prices", PricesHandler.class)
                                 .path("test", TestHandler.class)
                                 .path("pricesdl", PricesDownloadHandler.class)
-                                .path("data/:symbol/:interval", ctx -> ctx.render(
-                                        String.format("Symbol: %s, Interval: %s",
-                                                ctx.getPathTokens().get("symbol"),
-                                                ctx.getPathTokens().get("interval"))))
+                                .path("data/:symbol/:interval", PriceDataHandler.class)
 //                                .files(f -> f.dir("static"))
 //                                .all(ctx -> ctx.render(ctx.file("static/index.html")))
                 ));

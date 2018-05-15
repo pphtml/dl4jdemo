@@ -2,6 +2,7 @@
 - list securit
 - data handler 1m/5m/1d
 - automaticka kopie heroku DB kazdy den
+- redirect - http://localhost:5050/data/amzn/1m -> http://localhost:5050/data/AMZN/1m
 
 23413329
 22804030
