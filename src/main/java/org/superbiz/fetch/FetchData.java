@@ -61,7 +61,7 @@ public class FetchData {
     public void fetchAllIntervals() throws IOException {
         fetchAll(price1mDAO, "1m", 7);
         fetchAll(price5mDAO, "5m", 60);
-//        fetchAll(price1dDAO, "1d", 3650);
+        fetchAll(price1dDAO, "1d", 3650);
     }
 
 //    private Optional<PriceDTO> readFromDB(String symbol) {
