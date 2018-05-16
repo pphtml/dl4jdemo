@@ -3,9 +3,19 @@
 - data handler 1m/5m/1d
 - automaticka kopie heroku DB kazdy den
 - redirect - http://localhost:5050/data/amzn/1m -> http://localhost:5050/data/AMZN/1m
+- prices - report - pro 1m/5m/1d
+- vyhodit "e":null
 
+prod
+23413351
+
+dev
+23482498
 23413329
 22804030
+
+https://wixi.herokuapp.com/data/amzn/1d  201.29 / 54.99
+
 
 
 - prices - 1m & 5m
@@ -58,6 +68,7 @@ https://www.geforce.com/hardware/desktop-gpus/geforce-605-oem/specifications
 
 select sum(octet_length(p.data)) from price_1m p;
 select sum(octet_length(p.data)) from price_5m p;
+select sum(octet_length(p.data)) from price_1d p;
 select sum(octet_length(fv.parameters)), sum(octet_length(fv.analysts)), sum(octet_length(fv.insiders)) from market_fin_viz fv;
 po 1. dni: 308507,258671,247757
            349822,258671,249544
