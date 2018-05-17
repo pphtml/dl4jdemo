@@ -1,15 +1,14 @@
 package org.superbiz.web;
 
-import org.superbiz.dao.MarketFinVizDAO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.superbiz.dao.SecurityDAO;
-import org.superbiz.dto.MarketFinVizDTO;
+import org.superbiz.dto.SecurityDTO;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class SecuritiesListHandler implements Handler {
     @Inject
@@ -18,15 +17,18 @@ public class SecuritiesListHandler implements Handler {
     @Inject
     SecurityDAO securityDAO;
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     @Override
     public void handle(Context ctx) throws Exception {
-        securityDAO.fetchAll();
-
-//        String text = statuses.stream()
-//                .map(finViz -> String.format("%s: successUpdated: %s, errorUpdated: %s, errorMsg: %s, warning: %s",
-//                        finViz.getSymbol(), finViz.getLastUpdatedSuccess(), finViz.getLastUpdatedError(),
-//                        finViz.getLastError(), finViz.getLastWarning()))
-//                .collect(Collectors.joining("\n"));
-//        ctx.getResponse().send(text);
+        List<SecurityDTO> securities = securityDAO.findAll();
+        String result = OBJECT_MAPPER.writeValueAsString(securities);
+        ctx.getResponse().send(result);
     }
+
+//    public static void main(String[] args) throws JsonProcessingException {
+//        List<SecurityDTO> securities = Arrays.asList(SecurityDTO.of("AMZN", "am"), SecurityDTO.of("FB", "f"));
+//        String result = OBJECT_MAPPER.writeValueAsString(securities);
+//        System.out.println(result);
+//    }
 }
