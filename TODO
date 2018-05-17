@@ -1,10 +1,14 @@
 - download 1d
-- list securit
-- data handler 1m/5m/1d
 - automaticka kopie heroku DB kazdy den
-- redirect - http://localhost:5050/data/amzn/1m -> http://localhost:5050/data/AMZN/1m
 - prices - report - pro 1m/5m/1d
-- vyhodit "e":null
+- oprava e:
+  - list http://localhost:5050/data/msft/1d
+    http://localhost:5050/data/msft/5m
+    http://localhost:5050/data/msft/1m
+  - jeste jeden titul
+  - odmazat listy
+  - debug MSFT cteni
+- redirect - http://localhost:5050/data/amzn/1m -> http://localhost:5050/data/AMZN/1m
 
 prod
 23430512

@@ -1,6 +1,7 @@
 package org.superbiz.fetch.model;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -124,6 +125,7 @@ public class TickData {
         this.volume = volume;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("e")
     public List<Event> getEvents() {
         return events;
