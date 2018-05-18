@@ -47,9 +47,11 @@ https://www.chilkatsoft.com/java-loadLibrary-Linux.asp
 https://stackoverflow.com/questions/16227045/how-to-add-so-file-to-the-java-library-path-in-linux
 https://www.nvidia.com/en-us/data-center/gpu-accelerated-applications/tensorflow/
 https://www.geforce.com/hardware/desktop-gpus/geforce-605-oem/specifications
+https://towardsdatascience.com/tensorflow-speech-recognition-challenge-solution-outline-9c42dbd219c9 - speech
 
 - http://playground.tensorflow.org
 - https://www.datacamp.com/community/tutorials/tensorflow-tutorial
+- https://www.datacamp.com/community/tutorials/lstm-python-stock-market
 
 - titanic
 - xor priklad - XorExample
@@ -70,6 +72,10 @@ https://www.geforce.com/hardware/desktop-gpus/geforce-605-oem/specifications
 - https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
 
 - https://smalldata.tech/blog/2016/05/03/building-a-simple-neural-net-in-java
+- templating library: https://www.mscharhag.com/java/rocker-template-engine
+- vectorized algorithms in Java (SIMD, SSE, AVX) - http://richardstartin.uk/vectorised-algorithms-in-java/
+    http://prestodb.rocks/code/simd/
+    https://astojanov.github.io/blog/2017/12/20/scala-simd.html
 
 select sum(octet_length(p.data)) from price_1m p;
 select sum(octet_length(p.data)) from price_5m p;

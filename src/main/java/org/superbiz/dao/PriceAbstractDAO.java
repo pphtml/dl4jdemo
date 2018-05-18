@@ -5,6 +5,7 @@ import org.jooq.impl.TableImpl;
 import org.superbiz.db.ConnAndDSL3;
 import org.superbiz.db.ConnAndDSLProvider;
 import org.superbiz.dto.PriceDTO;
+import org.superbiz.fetch.model.TickData;
 import org.superbiz.util.DateConverter;
 import org.superbiz.util.TickDataConverter;
 
@@ -143,5 +144,18 @@ public abstract class PriceAbstractDAO {
                     .build())
                     .collect(Collectors.toList());
         }
+    }
+
+    public Optional<PriceDTO> fixEmptyCAArrays(Optional<PriceDTO> optionalPriceDTO) {
+        if (optionalPriceDTO.isPresent()) {
+            List<TickData> tickDataList = optionalPriceDTO.get().getData();
+            for (TickData tickData : tickDataList) {
+                if (tickData.getEvents() != null && tickData.getEvents().size() == 0) {
+                    tickData.setEvents(null);
+                }
+            }
+        }
+
+        return optionalPriceDTO;
     }
 }

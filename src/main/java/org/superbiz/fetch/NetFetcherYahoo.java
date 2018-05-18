@@ -132,7 +132,9 @@ public class NetFetcherYahoo {
                                     eventList.add(event);
                                 }
                             }
-                            tickData.setEvents(eventList);
+                            if (eventList.size() > 0) {
+                                tickData.setEvents(eventList);
+                            }
                         }
                         return tickData;
                     })

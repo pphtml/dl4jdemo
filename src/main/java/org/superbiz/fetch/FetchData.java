@@ -54,7 +54,9 @@ public class FetchData {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
         //fetchData.fetchAllIntervals();
-        fetchData.fetchAll(fetchData.price1dDAO, "1d", 3650);
+        fetchData.fetchAll(fetchData.price1mDAO, "1m", 7);
+        //fetchData.fetchAll(fetchData.price5mDAO, "5m", 60);
+        //fetchData.fetchAll(fetchData.price1dDAO, "1d", 3650);
         //PriceDTO price = fetchData.readFromDB("AMZN");
     }
 
@@ -93,7 +95,10 @@ public class FetchData {
                             .withLastUpdatedError(null)
                             .withLastError(null)
                             .build();
-                    final Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
+                    //final Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
+                    Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
+                    oldOptionalPriceDTO = priceDAO.fixEmptyCAArrays(oldOptionalPriceDTO);
+
                     PriceDTO mergedPriceDTO = mergePriceDTOs(oldOptionalPriceDTO, newPriceDTO);
                     priceDAO.insertOrUpdate(mergedPriceDTO);
                 } catch (InterruptedException | ExecutionException | DataProcessingException | ParsingException e) {
