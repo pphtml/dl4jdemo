@@ -1,8 +1,20 @@
 package org.superbiz.fetch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.superbiz.fetch.model.*;
+import com.google.common.base.Throwables;
+import org.superbiz.fetch.model.Event;
+import org.superbiz.fetch.model.EventType;
+import org.superbiz.fetch.model.ParsingResult;
+import org.superbiz.fetch.model.TickData;
+import org.superbiz.fetch.model.YahooChart;
+import org.superbiz.fetch.model.YahooData;
+import org.superbiz.fetch.model.YahooDividend;
+import org.superbiz.fetch.model.YahooError;
+import org.superbiz.fetch.model.YahooEvents;
+import org.superbiz.fetch.model.YahooIndicators;
+import org.superbiz.fetch.model.YahooQuote;
+import org.superbiz.fetch.model.YahooResult;
+import org.superbiz.fetch.model.YahooSplit;
 import org.superbiz.util.DateConverter;
 import org.superbiz.util.GlobalInit;
 
@@ -75,7 +87,7 @@ public class NetFetcherYahoo {
         } catch (IOException e) {
             logger.log(Level.WARNING, e.getMessage(), e);
             throw new ParsingException(String.format("processData exception: %s",
-                    ExceptionUtils.getStackTrace(e)));
+                    Throwables.getStackTraceAsString(e)));
         }
     }
 
@@ -144,7 +156,7 @@ public class NetFetcherYahoo {
             throw e;
         } catch (Exception e) {
             throw new ParsingException(String.format("Generic exception caught: %s",
-                    ExceptionUtils.getStackTrace(e)));
+                    Throwables.getStackTraceAsString(e)));
         }
     }
 

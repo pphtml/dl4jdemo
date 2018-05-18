@@ -79,19 +79,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native-platform</artifactId>
-            <version>${dl4j.version}</version>
-            <!--<classifier>linux-x86_64</classifier>-->
-        </dependency>
-
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-core</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <version>${async-http-client.version}</version>
@@ -205,14 +192,9 @@
             <!--<version>2.1.0</version>-->
         <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/org.datavec/datavec-api -->
-        <dependency>
-            <groupId>org.datavec</groupId>
-            <artifactId>datavec-hadoop</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
 
 
-
+        <!-- mozna vyhodit i tohle... -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
