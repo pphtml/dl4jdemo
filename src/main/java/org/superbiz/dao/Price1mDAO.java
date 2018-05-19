@@ -2,6 +2,7 @@ package org.superbiz.dao;
 
 import org.jooq.TableField;
 import org.jooq.impl.TableImpl;
+import org.superbiz.dto.PriceDTO;
 
 import java.sql.Timestamp;
 
@@ -37,5 +38,10 @@ public class Price1mDAO extends PriceAbstractDAO {
     @Override
     public TableField<?, Timestamp> getTableFieldLastUpdatedError() {
         return PRICE_1M.LAST_UPDATED_ERROR;
+    }
+
+    @Override
+    public PriceDTO fixMultipleDayRecords(PriceDTO price) {
+        return price; // ignored form 1m
     }
 }

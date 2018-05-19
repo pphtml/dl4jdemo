@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.superbiz.dto.PriceDTO.PriceDTOBuilder.createPriceDTO;
 import static org.superbiz.model.jooq.Tables.SECURITY;
+import static org.superbiz.util.TimezoneNewYork.fromTimestamp;
 
 public class FetchData {
     static { GlobalInit.init(); }
@@ -54,10 +55,19 @@ public class FetchData {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
         //fetchData.fetchAllIntervals();
-        fetchData.fetchAll(fetchData.price1mDAO, "1m", 7);
+        //fetchData.fetchAll(fetchData.price1mDAO, "1m", 7);
         //fetchData.fetchAll(fetchData.price5mDAO, "5m", 60);
         //fetchData.fetchAll(fetchData.price1dDAO, "1d", 3650);
         //PriceDTO price = fetchData.readFromDB("AMZN");
+
+        Optional<PriceDTO> price = fetchData.price1dDAO.read("ORCL");
+        price.get().getData().forEach(tick -> {
+            LocalDateTime dateTime = fromTimestamp(tick.getTimestamp());
+            System.out.println(String.format("%s %s", dateTime, tick));
+        });
+
+//        PriceDTO fixed = fetchData.price1dDAO.fixMultipleDayRecords(price.get());
+//        fetchData.price1dDAO.insertOrUpdate(fixed);
     }
 
     public void fetchAllIntervals() throws IOException {
@@ -95,11 +105,12 @@ public class FetchData {
                             .withLastUpdatedError(null)
                             .withLastError(null)
                             .build();
-                    //final Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
-                    Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
-                    oldOptionalPriceDTO = priceDAO.fixEmptyCAArrays(oldOptionalPriceDTO);
+                    final Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
+                    // Optional<PriceDTO> oldOptionalPriceDTO = priceDAO.read(symbol);
+                    // oldOptionalPriceDTO = priceDAO.fixEmptyCAArrays(oldOptionalPriceDTO);
 
                     PriceDTO mergedPriceDTO = mergePriceDTOs(oldOptionalPriceDTO, newPriceDTO);
+                    mergedPriceDTO = priceDAO.fixMultipleDayRecords(mergedPriceDTO);
                     priceDAO.insertOrUpdate(mergedPriceDTO);
                 } catch (InterruptedException | ExecutionException | DataProcessingException | ParsingException e) {
                     LOGGER.log(Level.WARNING, String.format("Cannot read Trading Tick data for %s, reason: %s",

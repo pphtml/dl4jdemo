@@ -1,23 +1,6 @@
 package org.superbiz.fetch.model;
 
 public class YahooTradingPeriod {
-    /*": [
-            [
-    {
-        "timezone": "EST",
-            "end": 1513803600,
-            "start": 1513780200,
-            "gmtoffset": -18000
-    }
-            ],
-                    [
-    {
-        "timezone": "EST",
-            "end": 1513890000,
-            "start": 1513866600,
-            "gmtoffset": -18000
-    }
-            ],*/
     private String timezone;
     private long end;
     private long start;

@@ -158,4 +158,6 @@ public abstract class PriceAbstractDAO {
 
         return optionalPriceDTO;
     }
+
+    public abstract PriceDTO fixMultipleDayRecords(PriceDTO price);
 }
