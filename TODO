@@ -1,16 +1,10 @@
 - download 1d
 - automaticka kopie heroku DB kazdy den
 - prices - report - pro 1m/5m/1d
-- oprava e:
-  - list http://localhost:5050/data/msft/1d
-    http://localhost:5050/data/msft/5m
-    http://localhost:5050/data/msft/1m
-  - jeste jeden titul
-  - odmazat listy
-  - debug MSFT cteni
 - redirect - http://localhost:5050/data/amzn/1m -> http://localhost:5050/data/AMZN/1m
 
 prod
+22912318
 23430512
 23413351
 
