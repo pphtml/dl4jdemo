@@ -1,5 +1,6 @@
 package org.superbiz.fetch;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import org.superbiz.fetch.model.Event;
@@ -74,6 +75,8 @@ public class NetFetcherYahoo {
 
     public ParsingResult processData(String json) throws ParsingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         try {
             YahooResult result = objectMapper.readValue(json, YahooResult.class);
             if (result.getChart().getError() != null && result.getChart().getError().getCode() != null) {

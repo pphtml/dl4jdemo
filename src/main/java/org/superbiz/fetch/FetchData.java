@@ -54,17 +54,17 @@ public class FetchData {
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new BasicModule());
         FetchData fetchData = injector.getInstance(FetchData.class);
-        //fetchData.fetchAllIntervals();
+        fetchData.fetchAllIntervals();
         //fetchData.fetchAll(fetchData.price1mDAO, "1m", 7);
         //fetchData.fetchAll(fetchData.price5mDAO, "5m", 60);
         //fetchData.fetchAll(fetchData.price1dDAO, "1d", 3650);
         //PriceDTO price = fetchData.readFromDB("AMZN");
 
-        Optional<PriceDTO> price = fetchData.price1dDAO.read("ORCL");
-        price.get().getData().forEach(tick -> {
-            LocalDateTime dateTime = fromTimestamp(tick.getTimestamp());
-            System.out.println(String.format("%s %s", dateTime, tick));
-        });
+//        Optional<PriceDTO> price = fetchData.price1dDAO.read("ORCL");
+//        price.get().getData().forEach(tick -> {
+//            LocalDateTime dateTime = fromTimestamp(tick.getTimestamp());
+//            System.out.println(String.format("%s %s", dateTime, tick));
+//        });
 
 //        PriceDTO fixed = fetchData.price1dDAO.fixMultipleDayRecords(price.get());
 //        fetchData.price1dDAO.insertOrUpdate(fixed);

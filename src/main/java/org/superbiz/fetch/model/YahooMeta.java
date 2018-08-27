@@ -19,6 +19,15 @@ public class YahooMeta {
     private List<List<YahooTradingPeriod>> tradingPeriods;
     private String dataGranularity;
     private List<String> validRanges; // ["1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"]
+    // private Integer priceHint
+
+//    org.superbiz.fetch.ParsingException: processData exception: com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "priceHint" (class org.superbiz.fetch.model.YahooMeta), not marked as ignorable (15 known properties: "instrumentType", "firstTradeDate", "chartPreviousClose", "dataGranularity", "exchangeTimezoneName", "currentTradingPeriod", "scale", "exchangeName", "currency", "validRanges", "symbol", "timezone", "gmtoffset", "tradingPeriods", "previousClose"])
+// at [Source: java.io.StringReader@24361cfc; line: 1, column: 284] (through reference chain: org.superbiz.fetch.model.YahooResult["chart"]->org.superbiz.fetch.model.YahooChart["result"]->java.util.ArrayList[0]->org.superbiz.fetch.model.YahooData["meta"]->org.superbiz.fetch.model.YahooMeta["priceHint"])
+//	at com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.from(UnrecognizedPropertyException.java:62)
+//	at com.fasterxml.jackson.databind.DeserializationContext.handleUnknownProperty(DeserializationContext.java:834)
+//	at com.fasterxml.jackson.databind.deser.std.StdDeserializer.handleUnknownProperty(StdDeserializer.java:1093)
+//	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.handleUnknownProperty(BeanDeserializerBase.java:1485)
+
 
     public String getCurrency() {
         return currency;
