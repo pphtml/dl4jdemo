@@ -164,7 +164,9 @@ public class NetFetcherYahoo {
     }
 
     public static void main(String[] args) {
-        System.out.println(new NetFetcherYahoo().createUrl("^GSPC", "1d", 3600));
+        //System.out.println(new NetFetcherYahoo().createUrl("^GSPC", "1d", 3600));
         //System.out.println(new NetFetcherYahoo().createUrl("AMZN", "1d", 3600));
+        //System.out.println(new NetFetcherYahoo().createUrl("AMZN", "5m", 60));
+        System.out.println(new NetFetcherYahoo().createUrl("AMZN", "1m", 7));
     }
 }

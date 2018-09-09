@@ -22,14 +22,17 @@ public class TradingDayService {
     NonTradingDayDAO nonTradingDayDAO;
 
     public boolean isBeforeTradingStart() {
-        LocalDateTime timeNY = LocalDateTime.now(ZoneId.of("America/New_York"));
+        //LocalDateTime timeNY = LocalDateTime.now(ZoneId.of("America/New_York"));
+        LocalDateTime timeUTC = LocalDateTime.now(ZoneId.of("UTC"));
+        LocalDateTime timeNY = timeUTC;
 
         LocalDate date = timeNY.toLocalDate();
         LocalTime time = timeNY.toLocalTime();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         boolean weekend = dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
         boolean holiday = nonTradingDayDAO.isHoliday(date);
-        boolean periodBeforeTrading = time.getHour() >= 9 && time.getHour() < 10;
+        //boolean periodBeforeTrading = time.getHour() >= 9 && time.getHour() < 10;
+        boolean periodBeforeTrading = time.getHour() >= 13 && time.getHour() < 14;
 
         boolean result = !weekend && !holiday && periodBeforeTrading;
 
